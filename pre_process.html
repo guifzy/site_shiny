@@ -1,0 +1,115 @@
+---
+title: "Pré-processmanto da Base de Dados"
+author: "Guilherme Fernandes Monteiro"
+date: "2024-06-07"
+output: html_document
+runtime: shiny
+---
+
+## Introdução
+
+Este documento visa detalhar o pré-processamento dos dados, incluindo a carga dos dados, junção das tabelas e adição de colunas informativas.
+
+```{r setup, include=FALSE}
+# Carregar as bibliotecas necessárias
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(shiny)
+```
+
+## Iniciando o Caminho
+
+```{r}
+caminho <- "DBS.xlsx"  
+```
+
+
+## Função para Pré-Processamento
+
+```{r}
+preprocess_league_data <- function(caminho, main, aux, add = NULL, league) {
+ 
+  main_df <- read_excel(caminho, sheet = main)
+  aux_df <- read_excel(caminho, sheet = aux)
+  
+  # converter a coluna 'pay' para numérico
+  aux_df <- aux_df %>% mutate(pay = as.numeric(pay))
+  
+  
+  # full join com o dataframe principal
+  final_df <- full_join(main_df, aux_df, by = "cod")
+  
+  # se tiver adicional, realizamos mais uma junção
+  if (!is.null(add)) {
+    add_df <- read_excel(caminho, sheet = add)
+    final_df <- full_join(final_df, add_df, by = "cod")
+  }
+  
+  # substituir valores NA por 0
+  final_df[is.na(final_df)] <- 0
+  
+  # adicionar nome da liga
+  final_df <- final_df %>% mutate(league_name = league)
+  
+  return(final_df)
+}
+```
+
+## Executando a Função
+
+```{r}
+serieA_final <- preprocess_league_data(caminho, "SERIEA", "SERIEA_AUX", "SERIEA_ADD", "Brasileirao(serieA)")
+ligue_final <- preprocess_league_data(caminho, "LIGUE1", "LIGUE1_AUX", "LIGUE1_ADD", "Ligue 1")
+serieTIM_final <- preprocess_league_data(caminho, "SERIEATIM", "SERIEATIM_AUX", NULL, "Camp Italiano(SerieA TIM)")
+laliga_final <- preprocess_league_data(caminho, "LALIGA", "LALIGA_AUX", NULL, "La Liga")
+premierleague_final <- preprocess_league_data(caminho, "PREMIERLEAGUE", "PREMIERLEAGUE_AUX", "PREMIERLEAGUE_ADD", "Premier League")
+bundesliga_final <- preprocess_league_data(caminho, "BUNDESLIGA", "BUNDESLIGA_AUX", NULL, "Bundesliga")
+```
+
+
+```{r}
+# Definir a interface do usuário
+ui <- fluidPage(
+  titlePanel("Pré-processamento dos Dados"),
+  sidebarLayout(
+    sidebarPanel(
+      helpText("Demonstração final após o pré-processamento.")
+    ),
+    mainPanel(
+      tabsetPanel(
+        tabPanel("Brasileirão", tableOutput("tabela_brasileirao")),
+        tabPanel("Ligue 1", tableOutput("tabela_ligue1")),
+        tabPanel("Serie A TIM", tableOutput("tabela_serieatim")),
+        tabPanel("La Liga", tableOutput("tabela_laliga")),
+        tabPanel("Premier League", tableOutput("tabela_premierleague")),
+        tabPanel("Bundesliga", tableOutput("tabela_bundesliga"))
+      )
+    )
+  )
+)
+
+# Definir a lógica do servidor
+server <- function(input, output) {
+  output$tabela_brasileirao <- renderTable({
+    head(serieA_final)
+  })
+  output$tabela_ligue1 <- renderTable({
+    head(ligue_final)
+  })
+  output$tabela_serieatim <- renderTable({
+    head(serieTIM_final)
+  })
+  output$tabela_laliga <- renderTable({
+    head(laliga_final)
+  })
+  output$tabela_premierleague <- renderTable({
+    head(premierleague_final)
+  })
+  output$tabela_bundesliga <- renderTable({
+    head(bundesliga_final)
+  })
+}
+
+# Executar o aplicativo Shiny
+shinyApp(ui = ui, server = server)
