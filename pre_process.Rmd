@@ -16,6 +16,7 @@ library(readxl)
 library(dplyr)
 library(tidyr)
 library(shiny)
+library(purrr)
 ```
 
 ## Iniciando o Caminho
@@ -35,6 +36,7 @@ preprocess_league_data <- function(caminho, main, aux, add = NULL, league) {
   
   # converter a coluna 'pay' para numérico
   aux_df <- aux_df %>% mutate(pay = as.numeric(pay))
+  main_df <- main_df %>% mutate(season_profit = as.numeric(season_profit))
   
   
   # full join com o dataframe principal
@@ -67,6 +69,13 @@ premierleague_final <- preprocess_league_data(caminho, "PREMIERLEAGUE", "PREMIER
 bundesliga_final <- preprocess_league_data(caminho, "BUNDESLIGA", "BUNDESLIGA_AUX", NULL, "Bundesliga")
 ```
 
+## DatFrame Final
+
+```{r}
+df_final <- bind_rows(serieA_final, ligue_final, serieTIM_final, laliga_final, premierleague_final, bundesliga_final)
+
+df_final[is.na(df_final)] <- 0
+```
 
 ```{r}
 # Definir a interface do usuário
@@ -78,6 +87,7 @@ ui <- fluidPage(
     ),
     mainPanel(
       tabsetPanel(
+        tabPanel("Tabela Final", tableOutput("df_final")),
         tabPanel("Brasileirão", tableOutput("tabela_brasileirao")),
         tabPanel("Ligue 1", tableOutput("tabela_ligue1")),
         tabPanel("Serie A TIM", tableOutput("tabela_serieatim")),
@@ -91,6 +101,9 @@ ui <- fluidPage(
 
 # Definir a lógica do servidor
 server <- function(input, output) {
+  output$df_final <- renderTable({
+    tail(df_final)
+  })
   output$tabela_brasileirao <- renderTable({
     head(serieA_final)
   })
