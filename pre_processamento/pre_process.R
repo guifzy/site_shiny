@@ -2,8 +2,11 @@ library(readxl)
 library(dplyr)
 library(tidyr)
 library(openxlsx)
+library(rvest)
+library(stringr)
+rm(list=ls())
 
-caminho <- "pagina_analise_times/site_shiny/DBS.xlsx"  
+caminho <- "DBS.xlsx"  
 
 # função para o pré-processamento
 preprocess_league_data <- function(caminho, main, aux, add = NULL, league) {
