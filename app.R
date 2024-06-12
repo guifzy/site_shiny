@@ -8,6 +8,8 @@ library(openxlsx)
 
 # Leitura do arquivo
 data <- read.xlsx("all_leagues.xlsx", sheet = "All Leagues")
+data <- data %>% mutate(goals_scored = as.numeric(goals_scored))
+data <- data %>% mutate(goals_received = as.numeric(goals_received))
 
 # Interface do usuário (UI)
 ui <- fluidPage(
@@ -21,7 +23,7 @@ ui <- fluidPage(
                         ),
                         mainPanel(
                           tableOutput("data"),
-                          actionButton("full_df", "ver mais")
+                          actionButton("full_df", "Ver mais")
                         )
                       )
              ),
@@ -29,7 +31,7 @@ ui <- fluidPage(
                       sidebarLayout(
                         sidebarPanel(
                           selectInput("plot_type", "Selecione o tipo de Dashboard:",
-                                      choices = c("Desempenho Geral", "Comparativo de Ligas", "Estatísticas de Time")),
+                                      choices = c("Desempenho Geral", "Comparativo de Ligas", "Estatísticas de Time", "Clusters de Desempenho")),
                           uiOutput("liga_selector_dashboard"),
                           actionButton("update_plot", "Atualizar Plot")
                         ),
@@ -57,60 +59,63 @@ ui <- fluidPage(
 
 # Servidor (Server)
 server <- function(input, output, session) {
-  # atualiza os seletores de ligas dinamicamente
+  # armazena o valor da liga escolhido para o filtro do df
   output$liga_selector <- renderUI({
     selectInput("liga", "Selecione a Liga:", choices = c("Todos", unique(data$league_name)))
   })
   
-  # seletor de times 
+  # armazena o valor do time escolhido para o filtro do df
   output$team_selector <- renderUI({
     req(input$liga)
-    if (input$liga == "Todos") { # caso o input das ligas seja todos ele retorna apenas a opção de todos
+    if (input$liga == "Todos") {
       return(selectInput("team", "Selecione o Time:", choices = "Todos"))
     }
     selectInput("team", "Selecione o Time:", choices = c("Todos", unique(data$team[data$league_name == input$liga])))
   })
   
-  # seletor de liga para o dashboard
+  # armazena o valor da liga para o dashboard
   output$liga_selector_dashboard <- renderUI({
     req(input$plot_type)
-    if(input$plot_type == "Comparativo de Ligas") {
-      return(selectInput("liga_dashboard", "Selecione a Liga:", choices = ""))
+    if (input$plot_type == "Comparativo de Ligas") {
+      return(selectInput("liga_dashboard", "Selecione a Liga:", choices = "")) # caso escolha comparação de ligas o botão de time some
     }
-    selectInput("liga_dashboard", "Selecione a Liga:", choices = unique(data$league_name))
+    if (input$plot_type == "Clusters de Desempenho") { # caso escolha o grafico de cluster, muda as opções
+      return(selectInput("relation_cluster", "Selecione a Relação:", choices = c("Gols Marcados/Recebidos", "Gols em Relação a Renda", "Relação Vitória/Derrota", "Vitórias em Relação a Renda")))
+    }
+    selectInput("liga_dashboard", "Selecione a Liga:", choices = unique(data$league_name)) #armazena o nome da liga em 'liga_dashboard'
   })
   
-  # seletor de times para o dashboard
+  # Seletor de times para a predicao
   output$team_selector_pred <- renderUI({
     req(input$liga_pred)
     selectInput("team_pred", "Selecione o Time:", choices = unique(data$team[data$league_name == input$liga_pred]))
   })
   
-  # exibe o DataFrame utilizado com filtro de pesquisa
+  # Exibe o DataFrame utilizado com filtro de pesquisa
   observeEvent(input$update_filter, {
-    filtred_data <- data
+    filtered_data <- data
     if (input$liga != "Todos") {
-      filtred_data <- filtred_data %>% filter(league_name == input$liga)
+      filtered_data <- filtered_data %>% filter(league_name == input$liga)
     }
     if (input$team != "Todos") {
-      filtred_data <- filtred_data %>% filter(team == input$team)
+      filtered_data <- filtered_data %>% filter(team == input$team)
     }
     output$data <- renderTable({
-      head(filtred_data)
+      head(filtered_data)
     })
   })
   
-  # mostra DataFrame completo ao clicar no botão "ver mais"
+  # Mostra DataFrame completo ao clicar no botão "Ver mais"
   observeEvent(input$full_df, {
-    filtred_data <- data
+    filtered_data <- data
     if (input$liga != "Todos") {
-      filtred_data <- filtred_data %>% filter(league_name == input$liga)
+      filtered_data <- filtered_data %>% filter(league_name == input$liga)
     }
     if (input$team != "Todos") {
-      filtred_data <- filtred_data %>% filter(team == input$team)
+      filtered_data <- filtered_data %>% filter(team == input$team)
     }
     output$data <- renderTable({
-      filtred_data
+      filtered_data
     })
   })
   
@@ -118,7 +123,7 @@ server <- function(input, output, session) {
   output$dashboard_plot <- renderPlot({
     req(input$update_plot)
     isolate({
-      liga_data <- data %>% filter(league_name == input$liga_dashboard)
+      liga_data <- data %>% filter(league_name == input$liga_dashboard) # filtra a partir da escolha de liga
       
       # Sequência de if/else para determinar qual gráfico exibir
       if (input$plot_type == "Desempenho Geral") {
@@ -154,6 +159,60 @@ server <- function(input, output, session) {
                size = "Ganhou Campeonato Continental",
                caption = "Fonte: Dados extraídos de 2023") +
           theme_minimal()
+      } else if (input$plot_type == "Clusters de Desempenho") {
+        # normalização dos dados
+        cluster_data <- data %>%
+          select(goals_scored, goals_received, wins, losses, draws, season_profit, league_n) %>%
+          na.omit() %>%
+          scale()
+        
+        # k-means
+        set.seed(123)
+        k <- kmeans(cluster_data, centers = 3)  # ajuste do num de clusters
+        
+        # adicionando os clusters aos dados
+        data$cluster <- factor(k$cluster)
+        
+        # plot dos clusters
+        
+        if (input$relation_cluster == "Gols Marcados/Recebidos"){
+          p <- ggplot(data, aes(x = goals_scored, y = goals_received, color = cluster)) +
+            geom_point() +
+            labs(title = "Desempenho em Relação a Gols",
+                 x = "Gols Marcados",
+                 y = "Gols Recebidos",
+                 z = "Lucro da Temporada",
+                 color = "Cluster",
+                 caption = "Fonte: Dados extraídos de 2023") +
+            theme_minimal()
+        } else if(input$relation_cluster == "Gols em Relação a Renda"){
+          p <- ggplot(data, aes(x = goals_scored, y = season_profit, color = cluster)) +
+            geom_point() +
+            labs(title = "Gols em Relação a Renda",
+                 x = "Gols Marcados",
+                 y = "Lucro da Temporada",
+                 color = "Cluster",
+                 caption = "Fonte: Dados extraídos de 2023") +
+            theme_minimal()
+        } else if(input$relation_cluster == "Relação Vitória/Derrota"){
+          p <- ggplot(data, aes(x = wins, y = losses, color = cluster)) +
+            geom_point() +
+            labs(title = "Relação Vitória/Derrota",
+                 x = "Vitórias",
+                 y = "Derrotas",
+                 color = "Cluster",
+                 caption = "Fonte: Dados extraídos de 2023") +
+            theme_minimal()
+        } else if(input$relation_cluster == "Vitórias em Relação a Renda"){
+          p <- ggplot(data, aes(x = wins, y = season_profit, color = cluster)) +
+            geom_point() +
+            labs(title = "Vitórias em Relação a Renda",
+                 x = "Vitórias",
+                 y = "Lucro da Temporada",
+                 color = "Cluster",
+                 caption = "Fonte: Dados extraídos de 2023") +
+            theme_minimal()
+        }
       }
       
       p
@@ -164,54 +223,19 @@ server <- function(input, output, session) {
   output$dashboard_insight <- renderUI({
     req(input$update_plot)
     isolate({
+      insight <- ""
       if (input$plot_type == "Desempenho Geral") {
-        p <- "Este gráfico mostra o lucro da temporada de cada time. 
-              Os valores em milhões/bilhões são representados em notação científica. 
-              Times com maior lucro estão mais bem posicionados financeiramente."
+        insight <- "Este gráfico mostra o lucro da temporada de cada time. Os valores em milhões/bilhões são representados em notação científica. Times com maior lucro estão mais bem posicionados financeiramente."
       } else if (input$plot_type == "Comparativo de Ligas") {
-        p <- "Este gráfico compara o lucro da temporada entre diferentes ligas. 
-              Os boxplots mostram a distribuição dos lucros dentro de cada liga, com os pontos indicando os times individuais. 
-              Use este gráfico para identificar ligas mais lucrativas e a variação de lucros entre os times. 
-              Cada região tem sua respectiva moeda, os valores estão padronizados."
+        insight <- "Este gráfico compara o lucro da temporada entre diferentes ligas. Os boxplots mostram a distribuição dos lucros dentro de cada liga, com os pontos indicando os times individuais. Use este gráfico para identificar ligas mais lucrativas e a variação de lucros entre os times. Cada região tem sua respectiva moeda, os valores estão padronizados."
       } else if (input$plot_type == "Estatísticas de Time") {
-        p <- "Este gráfico mostra o desempenho dos times em termos de lucro da temporada e posição final no campeonato. 
-              Pontos coloridos indicam se o time ganhou o campeonato nacional e o tamanho dos pontos indica se o time ganhou o campeonato continental. 
-              As etiquetas mostram o nome de cada time."
+        insight <- "Este gráfico mostra o desempenho dos times em termos de lucro da temporada e posição final no campeonato. Pontos coloridos indicam se o time ganhou o campeonato nacional e o tamanho dos pontos indica se o time ganhou o campeonato continental. As etiquetas mostram o nome de cada time."
       }
       
-      HTML(paste("<p>", p, "</p>"))
+      HTML(paste("<p>", insight, "</p>"))
     })
   })
   
-  # Predição de rendimento
-  output$prediction_result <- renderPrint({
-    req(input$predict)
-    isolate({
-      team_data <- data %>% filter(league_name == input$liga_pred, team == input$team_pred)
-      
-      # Verifica se há informações suficientes para predição
-      if (nrow(team_data) > 0) {
-        model <- lm(season_profit ~ kit + financial_fp + renda_19 + renda_20 + renda_21 + renda_22 +
-                      despesa_19 + despesa_20 + despesa_21 + despesa_22, data = team_data)
-        pred <- predict(model, newdata = data.frame(kit = mean(team_data$kit, na.rm = TRUE),
-                                                    financial_fp = team_data$financial_fp[1],
-                                                    renda_19 = mean(team_data$renda_19, na.rm = TRUE),
-                                                    renda_20 = mean(team_data$renda_20, na.rm = TRUE),
-                                                    renda_21 = mean(team_data$renda_21, na.rm = TRUE),
-                                                    renda_22 = mean(team_data$renda_22, na.rm = TRUE),
-                                                    despesa_19 = mean(team_data$despesa_19, na.rm = TRUE),
-                                                    despesa_20 = mean(team_data$despesa_20, na.rm = TRUE),
-                                                    despesa_21 = mean(team_data$despesa_21, na.rm = TRUE),
-                                                    despesa_22 = mean(team_data$despesa_22, na.rm = TRUE)))
-        
-        paste("Predição de Rendimento para", input$team_pred, "no ano", input$ano_pred, ":", round(pred, 2))
-      } else {
-        "Não há dados suficientes para realizar a predição."
-      }
-    })
-  })
-  
-  # exibe o DataFrame ao abrir a página
   output$data <- renderTable({
     head(data)
   })
