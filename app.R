@@ -5,67 +5,145 @@ library(shiny)
 library(ggplot2)
 library(caret)
 library(openxlsx)
+library(shinydashboard)
+library(shinyWidgets)
 
-# Leitura do arquivo
+# leitura do arquivo
 data <- read.xlsx("all_leagues.xlsx", sheet = "All Leagues")
 data <- data %>% mutate(goals_scored = as.numeric(goals_scored), 
                         goals_received = as.numeric(goals_received))
 
-# Interface do usuário (UI)
-ui <- fluidPage(
-  navbarPage("Futebol Analytics",
-             tabPanel("DataSet",
-                      sidebarLayout(
-                        sidebarPanel(
-                          uiOutput("liga_selector"),
-                          uiOutput("team_selector"),
-                          actionButton("update_filter", "Filtrar")
-                        ),
-                        mainPanel(
-                          tableOutput("data"),
-                          actionButton("full_df", "Ver mais")
-                        )
-                      )
-             ),
-             tabPanel("Dashboards",
-                      sidebarLayout(
-                        sidebarPanel(
-                          selectInput("plot_type", "Selecione o tipo de Dashboard:",
-                                      choices = c("Desempenho Geral", "Comparativo de Ligas", "Estatísticas de Time", "Clusters de Desempenho")),
-                          uiOutput("liga_selector_dashboard"),
-                          actionButton("update_plot", "Atualizar Plot")
-                        ),
-                        mainPanel(
-                          plotOutput("dashboard_plot"),
-                          uiOutput("dashboard_insight")
-                        )
-                      )
-             ),
-             tabPanel("Predição de Rendimento",
-                      sidebarLayout(
-                        sidebarPanel(
-                          
-                          uiOutput("liga_selector_pred"),
-                          numericInput("gols", "Gols Marcados:", value = 0, min = 0),
-                          numericInput("vitorias", "Vitórias:", value = 0, min = 0),
-                          numericInput("derrotas", "Derrotas:", value = 0, min = 0),
-                          numericInput("empates", "Empates:", value = 0, min = 0),
-                          numericInput("posicao", "Posição Final:", value = 20, min = 1, max = 20),
-                          selectInput("liga_cup", "Resultado no Campeonato:",
-                                      choices = c("W", "L")),
-                          actionButton("predict", "Predizer Rendimento")
-                        ),
-                        mainPanel(
-                          verbatimTextOutput("prediction_result"),
-                          uiOutput("model_performance")
-                        )
-                      )
-             )
+# interface do usuário (UI)
+ui <- dashboardPage(
+  dashboardHeader(
+    title = tagList(
+      span(class = "logo-lg", "Futebol Analytics"),
+      tags$button(id = "toggle_btn", class = "btn btn-default", "Toggle Sidebar") # definindo funções de deslizamento
+    )
+  ),
+  dashboardSidebar(
+    sidebarMenu(
+      id = "sidebar", # definindo o nome dos botões e colovando os icones
+      menuItem("DataSet", tabName = "dataset", icon = icon("table")),
+      menuItem("Dashboards", tabName = "dashboards", icon = icon("chart-bar")),
+      menuItem("Predição de Rendimento", tabName = "prediction", icon = icon("chart-line"))
+    )
+  ),
+  dashboardBody(
+    tags$head(
+      tags$script('
+        $(document).ready(function() {  /* animação do deslizamento */
+          $("#toggle_btn").click(function(){
+            $(".main-sidebar").toggleClass("sidebar-collapse");
+          });
+        });
+      '),
+      tags$style(HTML('
+        body, .content-wrapper, .right-side {
+          background-color: #303030; /* cor do fundo */
+          min-height: 100vh;
+          height: auto;
+        }
+        .main-header .navbar {
+          background-color: #333 !important; /* os slide bars e headers são pra mudar as cores */
+        }
+        .main-header .logo {
+          background-color: #333 !important;
+          color: #fff !important;
+        }
+        .main-sidebar {
+          background-color: #222 !important;
+        }
+        .main-sidebar .sidebar-menu>li.active>a {
+          border-left-color: #3c8dbc !important;
+        }
+        .table-responsive { /*  ajuste da tela */
+          overflow-x: auto;
+        }
+        .box {
+          background-color: #080808 !important; /* fundo da caixa */
+          border-color: #4a4a4a !important; /* borda da caixa */
+          color: #d7d8d9 !important; /* cor do texto */
+        }
+        .box-header {
+          color: #d7d8d9 !important; /* cor do texto do cabeçalho */
+          background: #4a4a4a !important; /* fundo do cabeçalho da caixa */
+        }
+      '))
+    ),
+    class = "skin-black",  # classe de tema pro corpo
+    tabItems(
+      tabItem(tabName = "dataset", # dados relativas a esta pagina
+              fluidRow(
+                box( # dados da caixa 
+                  title = "Filtros",
+                  solidHeader = TRUE,
+                  status = "primary",
+                  collapsible = TRUE,
+                  uiOutput("liga_selector"),
+                  uiOutput("team_selector"),
+                  actionButton("update_filter", "Filtrar")
+                ),
+                box( # dados da caixa 
+                  title = "Dados",
+                  solidHeader = TRUE,
+                  status = "primary",
+                  div(class = "table-responsive", tableOutput("data")),
+                  actionButton("full_df", "Ver mais")
+                )
+              )
+      ),
+      tabItem(tabName = "dashboards",
+              fluidRow(
+                box( # dados da caixa 
+                  title = "Configuração do Dashboard",
+                  solidHeader = TRUE,
+                  status = "primary",
+                  selectInput("plot_type", "Selecione o tipo de Dashboard:",
+                              choices = c("Desempenho Geral", "Comparativo de Ligas", "Estatísticas de Time", "Clusters de Desempenho")),
+                  uiOutput("liga_selector_dashboard"),
+                  actionButton("update_plot", "Atualizar Plot")
+                ),
+                box( # dados da caixa 
+                  title = "Dashboard",
+                  solidHeader = TRUE,
+                  status = "primary",
+                  plotOutput("dashboard_plot"),
+                  uiOutput("dashboard_insight")
+                )
+              )
+      ),
+      tabItem(tabName = "prediction",
+              fluidRow(
+                box( # dados da caixa 
+                  title = "Configurações de Predição",
+                  solidHeader = TRUE,
+                  status = "primary",
+                  uiOutput("liga_selector_pred"),
+                  numericInput("gols", "Gols Marcados:", value = 0, min = 0),
+                  numericInput("vitorias", "Vitórias:", value = 0, min = 0),
+                  numericInput("derrotas", "Derrotas:", value = 0, min = 0),
+                  numericInput("empates", "Empates:", value = 0, min = 0),
+                  numericInput("posicao", "Posição Final:", value = 20, min = 1, max = 20),
+                  selectInput("liga_cup", "Resultado no Campeonato:", choices = c("W", "L")),
+                  actionButton("predict", "Predizer Rendimento")
+                ),
+                box( # dados da caixa 
+                  title = "Resultado da Predição",
+                  solidHeader = TRUE,
+                  status = "primary",
+                  verbatimTextOutput("prediction_result"),
+                  uiOutput("model_performance")
+                )
+              )
+      )
+    )
   )
 )
 
 # Servidor (Server)
 server <- function(input, output, session) {
+
   # armazena o valor da liga escolhido para o filtro do df
   output$liga_selector <- renderUI({
     selectInput("liga", "Selecione a Liga:", choices = c("Todos", unique(data$league_name)))
@@ -97,11 +175,13 @@ server <- function(input, output, session) {
     selectInput("liga_pred", "Selecione a Liga:", choices = unique(data$league_name))
   })
   
-  # Exibe o DataFrame utilizado com filtro de pesquisa
+  # exibe o df utilizado com filtro de pesquisa
   observeEvent(input$update_filter, {
-    filtered_data <- data
+    filtered_data <- data 
+    # ao clicar no botão de filtro a função é acionada
+    # se todos estiver selecionado o if é acionado e o filtro é acionado, caso o contrario, o df inteiro é exibido
     if (input$liga != "Todos") {
-      filtered_data <- filtered_data %>% filter(league_name == input$liga)
+      filtered_data <- filtered_data %>% filter(league_name == input$liga) 
     }
     if (input$team != "Todos") {
       filtered_data <- filtered_data %>% filter(team == input$team)
@@ -111,7 +191,7 @@ server <- function(input, output, session) {
     })
   })
   
-  # Mostra DataFrame completo ao clicar no botão "Ver mais"
+  # mostra o df completo ao clicar no botão "Ver mais"
   observeEvent(input$full_df, {
     filtered_data <- data
     if (input$liga != "Todos") {
@@ -133,18 +213,18 @@ server <- function(input, output, session) {
       
       # Sequência de if/else para determinar qual gráfico exibir
       if (input$plot_type == "Desempenho Geral") {
-        p <- ggplot(liga_data, aes(x = cod, y = season_profit)) +
-          geom_bar(stat = "identity") +
-          scale_y_continuous(labels = scales::scientific) +
+        p <- ggplot(liga_data, aes(x = cod, y = season_profit)) + 
+          geom_bar(stat = "identity") + # bar plot simples
+          scale_y_continuous(labels = scales::scientific) + # exibe em notação cientifica
           labs(title = "Desempenho Geral por Time",
                x = "Time",
                y = "Lucro da Temporada (em milhões/bilhões)",
-               caption = "Fonte: Dados extraídos de 2023") +
+               caption = "Fonte: Dados extraídos de 2023") + # legenda do gráfico
           theme_minimal()
       } else if (input$plot_type == "Comparativo de Ligas") {
         p <- ggplot(data, aes(x = league_name, y = season_profit, fill = league_name)) +
-          geom_boxplot() +
-          geom_jitter(width = 0.2, alpha = 0.5) +
+          geom_boxplot() + # box plot
+          geom_jitter(width = 0.2, alpha = 0.5) + # dispersão dos dados no boxplot
           scale_y_continuous(labels = scales::scientific) +
           labs(title = "Comparativo de Ligas",
                x = "Liga",
@@ -154,9 +234,9 @@ server <- function(input, output, session) {
           theme_minimal() +
           theme(legend.position = "none")
       } else if (input$plot_type == "Estatísticas de Time") {
-        p <- ggplot(liga_data, aes(x = league_n, y = season_profit, color = as.factor(league_cup))) +
-          geom_point(aes(size = as.factor(league_cont))) +
-          geom_text(aes(label = team), vjust = -1, hjust = 0.5) +
+        p <- ggplot(liga_data, aes(x = league_n, y = season_profit, color = as.factor(league_cup))) + # treansdorma em fator a coluna de string
+          geom_point(aes(size = as.factor(league_cont))) + # o tamanho do ponto vai ser determinado pela coluna transformada em fator
+          geom_text(aes(label = team), vjust = -1, hjust = 0.5) + # nome dos times em cima do ponto
           scale_y_continuous(labels = scales::scientific) +
           labs(title = "Desempenho do Time",
                x = "Posição Final no Campeonato",
@@ -167,6 +247,7 @@ server <- function(input, output, session) {
           theme_minimal()
       } else if (input$plot_type == "Clusters de Desempenho") {
         # normalização dos dados
+        # seleciona as colunas pertinentes pro algoritimo de kmeans
         cluster_data <- data %>%
           select(goals_scored, goals_received, wins, losses, draws, season_profit, league_n) %>%
           na.omit() %>%
@@ -177,10 +258,9 @@ server <- function(input, output, session) {
         k <- kmeans(cluster_data, centers = 3)  # ajuste do num de clusters
         
         # adicionando os clusters aos dados
-        data$cluster <- factor(k$cluster)
+        data$cluster <- factor(k$cluster) # transforma em fatores os grupos de clusters
         
         # plot dos clusters
-        
         if (input$relation_cluster == "Gols Marcados/Recebidos"){
           p <- ggplot(data, aes(x = goals_scored, y = goals_received, color = cluster)) +
             geom_point() +
