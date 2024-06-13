@@ -8,8 +8,8 @@ library(openxlsx)
 
 # Leitura do arquivo
 data <- read.xlsx("all_leagues.xlsx", sheet = "All Leagues")
-data <- data %>% mutate(goals_scored = as.numeric(goals_scored))
-data <- data %>% mutate(goals_received = as.numeric(goals_received))
+data <- data %>% mutate(goals_scored = as.numeric(goals_scored), 
+                        goals_received = as.numeric(goals_received))
 
 # Interface do usuário (UI)
 ui <- fluidPage(
@@ -44,13 +44,20 @@ ui <- fluidPage(
              tabPanel("Predição de Rendimento",
                       sidebarLayout(
                         sidebarPanel(
-                          selectInput("liga_pred", "Selecione a Liga:", choices = unique(data$league_name)),
-                          uiOutput("team_selector_pred"),
-                          numericInput("ano_pred", "Ano de Predição:", value = 2024, min = 2020, max = 2030),
+                          
+                          uiOutput("liga_selector_pred"),
+                          numericInput("gols", "Gols Marcados:", value = 0, min = 0),
+                          numericInput("vitorias", "Vitórias:", value = 0, min = 0),
+                          numericInput("derrotas", "Derrotas:", value = 0, min = 0),
+                          numericInput("empates", "Empates:", value = 0, min = 0),
+                          numericInput("posicao", "Posição Final:", value = 20, min = 1, max = 20),
+                          selectInput("liga_cup", "Resultado no Campeonato:",
+                                      choices = c("W", "L")),
                           actionButton("predict", "Predizer Rendimento")
                         ),
                         mainPanel(
-                          verbatimTextOutput("prediction_result")
+                          verbatimTextOutput("prediction_result"),
+                          uiOutput("model_performance")
                         )
                       )
              )
@@ -85,10 +92,9 @@ server <- function(input, output, session) {
     selectInput("liga_dashboard", "Selecione a Liga:", choices = unique(data$league_name)) #armazena o nome da liga em 'liga_dashboard'
   })
   
-  # Seletor de times para a predicao
-  output$team_selector_pred <- renderUI({
-    req(input$liga_pred)
-    selectInput("team_pred", "Selecione o Time:", choices = unique(data$team[data$league_name == input$liga_pred]))
+  # Seletor de ligas para a predicao
+  output$liga_selector_pred <- renderUI({
+    selectInput("liga_pred", "Selecione a Liga:", choices = unique(data$league_name))
   })
   
   # Exibe o DataFrame utilizado com filtro de pesquisa
@@ -230,12 +236,90 @@ server <- function(input, output, session) {
         insight <- "Este gráfico compara o lucro da temporada entre diferentes ligas. Os boxplots mostram a distribuição dos lucros dentro de cada liga, com os pontos indicando os times individuais. Use este gráfico para identificar ligas mais lucrativas e a variação de lucros entre os times. Cada região tem sua respectiva moeda, os valores estão padronizados."
       } else if (input$plot_type == "Estatísticas de Time") {
         insight <- "Este gráfico mostra o desempenho dos times em termos de lucro da temporada e posição final no campeonato. Pontos coloridos indicam se o time ganhou o campeonato nacional e o tamanho dos pontos indica se o time ganhou o campeonato continental. As etiquetas mostram o nome de cada time."
+      }else if (input$plot_type == "Clusters de Desempenho") {
+        insight <- "Este gráfico mostra a análise de clusters de desempenho dos times. Cada cluster agrupa times com características semelhantes em termos de gols, vitórias, derrotas, empates e lucro da temporada."
       }
       
       HTML(paste("<p>", insight, "</p>"))
     })
   })
   
+  # modelo de ml regressão linear
+  observeEvent(input$predict, {
+    req(input$liga_pred)  # verificação reativa
+    
+    # seleciona apenas os dados da liga
+    data_liga <- data %>% filter(league_name == input$liga_pred)
+    
+    # transformando os valores boleanos e string em fatores
+    data_liga <- data_liga %>% mutate(league_cup = as.factor(league_cup))
+    
+    # dividindo as variáveis
+    X <- data_liga %>% select(goals_scored, goals_received, wins, losses, draws, matches_played, league_n, league_cup)
+    Y <- data_liga$season_profit
+    
+    
+    # divisão dos dados de treino e teste
+    set.seed(123) # para reprodutibilidade
+    index <- createDataPartition(Y, p = 0.8, list = FALSE)
+    train_X <- X[index,]
+    train_Y <- Y[index]
+    test_X <- X[-index,]
+    test_Y <- Y[-index]
+    
+    # modelo de regressão
+    modelo <- lm(train_Y ~ ., data = as.data.frame(train_X))
+    
+    # previsões
+    predicao_teste <- predict(modelo, newdata = as.data.frame(test_X))
+    
+    # Verificação dos níveis dos fatores
+    new_data <- data.frame(
+      goals_scored = input$gols,
+      goals_received = 0, 
+      wins = input$vitorias,
+      losses = input$derrotas, 
+      draws = input$empates, 
+      matches_played = input$derrotas + input$vitorias + input$empates, 
+      league_n = input$posicao,
+      league_cup = factor(input$liga_cup, levels = levels(data_liga$league_cup))
+    )
+    
+    # Verificação se há NA nos dados de entrada para predição
+    if (any(is.na(new_data))) {
+      output$prediction_result <- renderText({
+        "Erro: Existem valores NA nos dados de entrada. Verifique as entradas."
+      })
+      return()
+    }
+    
+    # valor final da predição
+    predicao_final <- predict(modelo, newdata = new_data)
+    format_final <- formatC(predicao_final, format = "f", digits = 2)
+    
+    # Verificação se a predição resultou em NA
+    if (is.na(predicao_final)) {
+      output$prediction_result <- renderText({
+        "Erro: A predição resultou em NA. Verifique os dados de entrada e o modelo."
+      })
+    } else {
+      output$prediction_result <- renderText({
+        paste("Previsão do lucro para o(a) ", input$liga_pred, " selecionado:", format_final)
+      })
+    }
+    
+    # avaliação do modelo
+    rmse <- sqrt(mean((predicao_teste - test_Y)^2))
+    R2 <- summary(modelo)$r.squared
+    
+    # outputs de desempenho do modelo
+    output$model_performance <- renderText({
+      paste("RMSE do modelo: ", round(rmse, 2), "\nR² do modelo: ", round(R2 * 100, 2), "%")
+    })
+  })
+  
+  
+  # inicializa o site com o tabela renderizada
   output$data <- renderTable({
     head(data)
   })
