@@ -1,5 +1,10 @@
-# site_shiny
+# Projeto:
+
 Site em shiny para analise do desempenho de times de futebol.
+
+# Objetivo:
+
+Entender o ambiente R, assim como sua vasta pssíbilidade de gráficos e ferramentas estatísticas. Além disso, testar a eficacia de modelos de ML no R.
 
 # Como abrir o site?
 
