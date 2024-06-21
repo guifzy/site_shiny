@@ -1,0 +1,2327 @@
+<!DOCTYPE html>
+<!-- saved from url=(0068)https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" data-lt-installed="true"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Guilherme Fernandes Monteiro">
+
+<title>Ligas e Times de Futebol (EDA)</title>
+<style class="anchorjs"></style><style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="./Ligas e Times de Futebol (EDA)_files/clipboard.min.js.download"></script><style type="text/css" id="operaUserStyle">
+  video {
+    filter: -opera-shader(url(data:text/plain;base64,Ly8gaHR0cHM6Ly9naXRodWIuY29tL0dQVU9wZW4tRWZmZWN0cy9GaWRlbGl0eUZYLUNBUwovLyB2MwoKdW5pZm9ybSBzaGFkZXIgaUNodW5rOwp1bmlmb3JtIGZsb2F0MiBpQ2h1bmtTaXplOwp1bmlmb3JtIGZsb2F0MiBpTW91c2U7CnVuaWZvcm0gZmxvYXQgaUFyZ3NbMV07Cgpjb25zdCBmbG9hdCBFUFNJT04gPSAwLjE7CmNvbnN0IGZsb2F0IFZfTUlOID0gMDsKY29uc3QgZmxvYXQgVl9MT1cgPSAwLjI1Owpjb25zdCBmbG9hdCBWX01FRCA9IDAuNTsKY29uc3QgZmxvYXQgVl9ISUdIID0gMC43NTsKY29uc3QgZmxvYXQgVl9NQVggPSAxOwoKY29uc3QgZmxvYXQgVEhSRVNIT0xEX0FSRUEgPSA4MDAgKiA2MDA7CmNvbnN0IGZsb2F0IE1JTl9BUkVBID0gNDAwICogMTAwOwpjb25zdCBmbG9hdCBNSU5fU1RSSVAgPSAyMDsKY29uc3QgZmxvYXQgTUFSR0lOID0gMTsKCmZsb2F0MyBwaXhlbChpbnQgeCwgaW50IHksIGZsb2F0MiB4eSkgewogICAgcmV0dXJuIGlDaHVuay5ldmFsKHh5ICsgZmxvYXQyKHgsIHkpKS5yZ2I7Cn0KCmZsb2F0MyBzaGFycGVuKGZsb2F0MiB4eSkgewogICAgZmxvYXQzIGYgPQogICAgICAgIHBpeGVsKC0xLCAtMSwgeHkpICogIDEgKwogICAgICAgIHBpeGVsKCAwLCAtMSwgeHkpICogLTEgKwogICAgICAgIHBpeGVsKCAxLCAtMSwgeHkpICogIDEgKwoKICAgICAgICBwaXhlbCgtMSwgMCwgeHkpICogLTEgICsKICAgICAgICBwaXhlbCggMCwgMCwgeHkpICogLTEgICsKICAgICAgICBwaXhlbCggMSwgMCwgeHkpICogLTEgICsKCiAgICAgICAgcGl4ZWwoLTEsIDEsIHh5KSAqIDEgICArCiAgICAgICAgcGl4ZWwoIDAsIDEsIHh5KSAqIC0xICArCiAgICAgICAgcGl4ZWwoIDEsIDEsIHh5KSAqIDE7CiAgICByZXR1cm4gZiAvIC0xOwp9CgpmbG9hdDQgUkdYMihmbG9hdDIgeHkpIHsKICAgIGZsb2F0NCBjb2xvciA9IGlDaHVuay5ldmFsKHh5KTsKCiAgICBpZiAoaUNodW5rU2l6ZS54ICogaUNodW5rU2l6ZS55IDwgTUlOX0FSRUEpIHsKICAgICAgICByZXR1cm4gY29sb3I7CiAgICB9CgogICAgaWYgKGlDaHVua1NpemUueSA8IE1JTl9TVFJJUCB8fCBpQ2h1bmtTaXplLnggPCBNSU5fU1RSSVApIHsKICAgICAgICByZXR1cm4gY29sb3I7CiAgICB9CgogICAgaWYgKHh5LnggPCBNQVJHSU4gfHwgeHkueCA+IChpQ2h1bmtTaXplLnggLSBNQVJHSU4pIHx8CiAgICAgICAgeHkueSA8IE1BUkdJTiB8fCB4eS55ID4gKGlDaHVua1NpemUueSAtIE1BUkdJTikpIHsKICAgICAgICByZXR1cm4gY29sb3I7CiAgICB9CgogICAgcmV0dXJuIGZsb2F0NChzaGFycGVuKHh5KSwgMSk7Cn0KCmZsb2F0IG1pbjMoZmxvYXQgeCwgZmxvYXQgeSwgZmxvYXQgeikgewogICAgcmV0dXJuIG1pbih4LCBtaW4oeSwgeikpOwp9CgpmbG9hdCBtYXgzKGZsb2F0IHgsIGZsb2F0IHksIGZsb2F0IHopIHsKICAgIHJldHVybiBtYXgoeCwgbWF4KHksIHopKTsKfQoKZmxvYXQgcmNwKGZsb2F0IHYpIHsKICAgIHJldHVybiAxIC8gdjsKfQoKZmxvYXQzIFJHWDMoZmxvYXQyIHh5LCBmbG9hdCBzdHJlbmd0aCkgewogICAgZmxvYXQzIGEgPSBwaXhlbCgtMSwgLTEsIHh5KTsKICAgIGZsb2F0MyBiID0gcGl4ZWwoIDAsIC0xLCB4eSk7CiAgICBmbG9hdDMgYyA9IHBpeGVsKCAxLCAtMSwgeHkpOwoKICAgIGZsb2F0MyBkID0gcGl4ZWwoLTEsIDAsIHh5KTsKICAgIGZsb2F0MyBlID0gcGl4ZWwoIDAsIDAsIHh5KTsKICAgIGZsb2F0MyBmID0gcGl4ZWwoIDEsIDAsIHh5KTsKCiAgICBmbG9hdDMgZyA9IHBpeGVsKC0xLCAxLCB4eSk7CiAgICBmbG9hdDMgaCA9IHBpeGVsKCAwLCAxLCB4eSk7CiAgICBmbG9hdDMgaSA9IHBpeGVsKCAxLCAxLCB4eSk7CgogICAgZmxvYXQgbW5SID0gbWluMyhtaW4zKGQuciwgZS5yLCBmLnIpLCBiLnIsIGgucik7CiAgICBmbG9hdCBtbkcgPSBtaW4zKG1pbjMoZC5nLCBlLmcsIGYuZyksIGIuZywgaC5nKTsKICAgIGZsb2F0IG1uQiA9IG1pbjMobWluMyhkLmIsIGUuYiwgZi5iKSwgYi5iLCBoLmIpOwoKICAgIGZsb2F0IG1uUjIgPSBtaW4zKG1pbjMobW5SLCBhLnIsIGMuciksIGcuciwgaS5yKTsKICAgIGZsb2F0IG1uRzIgPSBtaW4zKG1pbjMobW5HLCBhLmcsIGMuZyksIGcuZywgaS5nKTsKICAgIGZsb2F0IG1uQjIgPSBtaW4zKG1pbjMobW5CLCBhLmIsIGMuYiksIGcuYiwgaS5iKTsKCiAgICBtblIgPSBtblIgKyBtblIyOwogICAgbW5HID0gbW5HICsgbW5HMjsKICAgIG1uQiA9IG1uQiArIG1uQjI7CgogICAgZmxvYXQgbXhSID0gbWF4MyhtYXgzKGQuciwgZS5yLCBmLnIpLCBiLnIsIGgucik7CiAgICBmbG9hdCBteEcgPSBtYXgzKG1heDMoZC5nLCBlLmcsIGYuZyksIGIuZywgaC5nKTsKICAgIGZsb2F0IG14QiA9IG1heDMobWF4MyhkLmIsIGUuYiwgZi5iKSwgYi5iLCBoLmIpOwoKICAgIGZsb2F0IG14UjIgPSBtYXgzKG1heDMobXhSLCBhLnIsIGMuciksIGcuciwgaS5yKTsKICAgIGZsb2F0IG14RzIgPSBtYXgzKG1heDMobXhHLCBhLmcsIGMuZyksIGcuZywgaS5nKTsKICAgIGZsb2F0IG14QjIgPSBtYXgzKG1heDMobXhCLCBhLmIsIGMuYiksIGcuYiwgaS5iKTsKCiAgICBteFIgPSBteFIgKyBteFIyOwogICAgbXhHID0gbXhHICsgbXhHMjsKICAgIG14QiA9IG14QiArIG14QjI7CgogICAgZmxvYXQgcmNwTVIgPSByY3AobXhSKTsKICAgIGZsb2F0IHJjcE1HID0gcmNwKG14Ryk7CiAgICBmbG9hdCByY3BNQiA9IHJjcChteEIpOwoKICAgIGZsb2F0IGFtcFIgPSBzYXR1cmF0ZShtaW4obW5SLCAyIC0gbXhSKSAqIHJjcE1SKTsKICAgIGZsb2F0IGFtcEcgPSBzYXR1cmF0ZShtaW4obW5HLCAyIC0gbXhHKSAqIHJjcE1HKTsKICAgIGZsb2F0IGFtcEIgPSBzYXR1cmF0ZShtaW4obW5CLCAyIC0gbXhCKSAqIHJjcE1CKTsKCiAgICBhbXBSID0gc3FydChhbXBSKTsKICAgIGFtcEcgPSBzcXJ0KGFtcEcpOwogICAgYW1wQiA9IHNxcnQoYW1wQik7CgogICAgZmxvYXQgcGVhayA9IC1yY3AobWl4KDgsIDUsIHN0cmVuZ3RoKSk7CgogICAgZmxvYXQgd1IgPSBhbXBSICogcGVhazsKICAgIGZsb2F0IHdHID0gYW1wRyAqIHBlYWs7CiAgICBmbG9hdCB3QiA9IGFtcEIgKiBwZWFrOwoKICAgIGZsb2F0IHJjcFdlaWdodFIgPSByY3AoMSArIDQgKiB3Uik7CiAgICBmbG9hdCByY3BXZWlnaHRHID0gcmNwKDEgKyA0ICogd0cpOwogICAgZmxvYXQgcmNwV2VpZ2h0QiA9IHJjcCgxICsgNCAqIHdCKTsKCiAgICByZXR1cm4gZmxvYXQzKAogICAgICAgIHNhdHVyYXRlKChiLnIgKiB3UiArIGQuciAqIHdSICsgZi5yICogd1IgKyBoLnIgKiB3UiArIGUucikgKiByY3BXZWlnaHRSKSwKICAgICAgICBzYXR1cmF0ZSgoYi5nICogd0cgKyBkLmcgKiB3RyArIGYuZyAqIHdHICsgaC5nICogd0cgKyBlLmcpICogcmNwV2VpZ2h0RyksCiAgICAgICAgc2F0dXJhdGUoKGIuYiAqIHdCICsgZC5iICogd0IgKyBmLmIgKiB3QiArIGguYiAqIHdCICsgZS5iKSAqIHJjcFdlaWdodEIpKTsKfQoKCmZsb2F0NCBtYWluKGZsb2F0MiB4eSkgewoKICAgIGZsb2F0NCBvcmlnaW5hbENvbG9yID0gaUNodW5rLmV2YWwoeHkpOwogICAgaWYgKG9yaWdpbmFsQ29sb3IuYSA8IDEpIHsKICAgICAgICByZXR1cm4gaUNodW5rLmV2YWwoeHkpOwogICAgfQoKICAgIGZsb2F0IGludGVuc2l0eSA9IGlBcmdzWzBdOwogICAgZmxvYXQgc3RyZW5ndGggPSAwOwogICAgZmxvYXQzIGNvbG9yOwoKICAgIGlmIChpbnRlbnNpdHkgPCBWX01JTiArIEVQU0lPTikgewogICAgICAgIHN0cmVuZ3RoID0gMC4xMDsKICAgICAgICBjb2xvciA9IFJHWDMoeHksIHN0cmVuZ3RoKTsKCiAgICB9IGVsc2UgaWYgKGludGVuc2l0eSA+IFZfTE9XIC0gRVBTSU9OICYmIGludGVuc2l0eSA8IFZfTE9XICsgRVBTSU9OKSB7CiAgICAgICAgc3RyZW5ndGggPSAwLjMzOwogICAgICAgIGNvbG9yID0gUkdYMyh4eSwgc3RyZW5ndGgpOwoKICAgIH0gZWxzZSBpZiAoaW50ZW5zaXR5ID4gVl9NRUQgLSBFUFNJT04gJiYgaW50ZW5zaXR5IDwgVl9NRUQgKyBFUFNJT04pIHsKICAgICAgICBzdHJlbmd0aCA9IDAuNTsKICAgICAgICBjb2xvciA9IFJHWDMoeHksIHN0cmVuZ3RoKTsKCiAgICB9IGVsc2UgaWYgKGludGVuc2l0eSA+IFZfSElHSCAtIEVQU0lPTiAmJiBpbnRlbnNpdHkgPCBWX0hJR0ggKyBFUFNJT04pIHsKICAgICAgICBzdHJlbmd0aCA9IDAuOTk7CiAgICAgICAgY29sb3IgPSBSR1gzKHh5LCBzdHJlbmd0aCk7CgogICAgfSBlbHNlIGlmIChpbnRlbnNpdHkgPiBWX01BWCAtIEVQU0lPTikgewogICAgICAgIHN0cmVuZ3RoID0gMTsKICAgICAgICBjb2xvciA9IFJHWDIoeHkpLnJnYjsKICAgIH0KCiAgICByZXR1cm4gZmxvYXQ0KGNvbG9yLCBvcmlnaW5hbENvbG9yLmEpOwp9) -opera-args(0.75 calc(env(-opera-gx-accent-color-r)/255) calc(env(-opera-gx-accent-color-g)/255) calc(env(-opera-gx-accent-color-b)/255)));
+  }
+</style>
+<script src="./Ligas e Times de Futebol (EDA)_files/quarto.js.download"></script>
+<script src="./Ligas e Times de Futebol (EDA)_files/popper.min.js.download"></script>
+<script src="./Ligas e Times de Futebol (EDA)_files/tippy.umd.min.js.download"></script>
+<script src="./Ligas e Times de Futebol (EDA)_files/anchor.min.js.download"></script>
+<link href="./Ligas e Times de Futebol (EDA)_files/tippy.css" rel="stylesheet">
+<link href="./Ligas e Times de Futebol (EDA)_files/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="./Ligas e Times de Futebol (EDA)_files/bootstrap.min.js.download"></script>
+<link href="./Ligas e Times de Futebol (EDA)_files/bootstrap-icons.css" rel="stylesheet">
+<link href="./Ligas e Times de Futebol (EDA)_files/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="./Ligas e Times de Futebol (EDA)_files/kePrint.js.download"></script>
+<link href="./Ligas e Times de Futebol (EDA)_files/lightable.css" rel="stylesheet">
+
+
+<style>.ansi-display{font-family:monospace;white-space:pre-wrap;--ansiBlack: #000000;--ansiRed: #cd3131;--ansiGreen: #00BC00;--ansiYellow: #949800;--ansiBlue: #0451a5;--ansiMagenta: #bc05bc;--ansiCyan: #0598bc;--ansiWhite: #555555;--ansiBrightBlack: #666666;--ansiBrightRed: #cd3131;--ansiBrightGreen: #14CE14;--ansiBrightYellow: #b5ba00;--ansiBrightBlue: #0451a5;--ansiBrightMagenta: #bc05bc;--ansiBrightCyan: #0598bc;--ansiBrightWhite: #a5a5a5}.dark-mode .ansi-display{--ansiBlack: #000000;--ansiRed: #cd3131;--ansiGreen: #0DBC79;--ansiYellow: #e5e510;--ansiBlue: #2472c8;--ansiMagenta: #bc3fbc;--ansiCyan: #11a8cd;--ansiWhite: #e5e5e5;--ansiBrightBlack: #666666;--ansiBrightRed: #f14c4c;--ansiBrightGreen: #23d18b;--ansiBrightYellow: #f5f543;--ansiBrightBlue: #3b8eea;--ansiBrightMagenta: #d670d6;--ansiBrightCyan: #29b8db;--ansiBrightWhite: #e5e5e5}@keyframes ansi-displaly-run-blink{50%{opacity:0}}.fui-FluentProvider h2{border-bottom:none;padding-bottom:0}</style><style type="text/css">:root [href^="//mage98rquewz.com/"], :root [href^="//x4pollyxxpush.com/"], :root zeus-ad, :root span[id^="ezoic-pub-ad-placeholder-"], :root ins.adsbygoogle[data-ad-slot], :root guj-ad, :root gpt-ad, :root div[id^="zergnet-widget"], :root div[id^="vuukle-ad-"], :root div[id^="taboola-stream-"], :root div[id^="sticky_ad_"], :root div[id^="pa_sticky_ad_box_middle_"], :root div[id^="optidigital-adslot"], :root div[id^="gpt_ad_"], :root div[id^="ezoic-pub-ad-"], :root div[id^="dfp-ad-"], :root div[id^="crt-"][style], :root div[id^="adspot-"], :root div[id^="adrotate_widgets-"], :root ps-connatix-module, :root div[id^="ad_position_"], :root div[id^="ad-div-"], :root div[id*="ScriptRoot"], :root div[id*="MarketGid"], :root div[data-native_ad], :root div[data-native-ad], :root div[data-id-advertdfpconf], :root hl-adsense, :root div[data-contentexchange-widget], :root div[data-alias="300x250 Ad 2"], :root div[data-adzone], :root div[data-adunit-path], :root div[data-adname], :root div[data-ad-wrapper], :root div[data-ad-placeholder], :root div[class^="native-ad-"], :root div[data-dfp-id], :root div[class^="kiwi-ad-wrapper"], :root div[aria-label="Ads"], :root display-ads, :root display-ad-component, :root bottomadblock, :root atf-ad-slot, :root aside[id^="adrotate_widgets-"], :root ark-top-ad, :root amp-fx-flying-carpet, :root amp-embed[type="taboola"], :root amp-connatix-player, :root amp-ad-custom, :root amp-ad, :root div[id^="google_dfp_"], :root ad-slot, :root ad-shield-ads, :root a[style="width:100%;height:100%;z-index:10000000000000000;position:absolute;top:0;left:0;"], :root a[onmousedown^="this.href='https://paid.outbrain.com/network/redir?"][target="_blank"] + .ob_source, :root a[onmousedown^="this.href='http://paid.outbrain.com/network/redir?"][target="_blank"] + .ob_source, :root a[onmousedown^="this.href='http://paid.outbrain.com/network/redir?"][target="_blank"], :root a[href^="https://www.purevpn.com/"][href*="&utm_source=aff-"], :root a[href^="https://www.onlineusershielder.com/"], :root a[href^="https://www.nudeidols.com/cams/"], :root a[href^="https://financeads.net/tc.php?"], :root a[href^="https://www.mrskin.com/tour"], :root a[href^="https://www.kingsoffetish.com/tour?partner_id="], :root a[href^="https://www.infowarsstore.com/"] > img, :root a[href^="https://www.highperformancecpmgate.com/"], :root a[href^="https://www.highcpmrevenuenetwork.com/"], :root a[href^="https://lnkxt.bannerator.com/"], :root a[href^="https://www.geekbuying.com/dynamic-ads/"], :root a[href^="https://www.friendlyduck.com/AF_"], :root a[href^="https://www.financeads.net/tc.php?"], :root [href^="https://www.herbanomic.com/"] > img, :root a[href^="https://maymooth-stopic.com/"], :root a[href^="https://www.dql2clk.com/"], :root a[href^="https://www.nutaku.net/signup/landing/"], :root a[href^="https://www.dating-finder.com/signup/?ai_d="], :root a[href^="https://explore-site.com/"], :root a[href^="https://www.brazzersnetwork.com/landing/"], :root a[href^="https://www.adxsrve.com/"], :root [data-template-type="nativead"], :root a[href^="https://www.endorico.com/Smartlink/"], :root a[href^="https://www.adultempire.com/"][href*="?partner_id="], :root a[href^="https://voluum.prom-xcams.com/"], :root a[href^="https://twinrdsrv.com/"], :root a[href^="https://trk.nfl-online-streams.club/"], :root a[href^="https://tracking.avapartner.com/"], :root a[href^="https://track.wg-aff.com"], :root a[href^="https://track.ultravpn.com/"], :root a[href^="https://track.afcpatrk.com/"], :root a[href^="https://track.1234sd123.com/"], :root a[href^="https://torguard.net/aff.php"] > img, :root a[href^="https://tc.tradetracker.net/"] > img, :root a[href^="https://tatrck.com/"], :root a[href^="https://click.candyoffers.com/"], :root [href^="https://zstacklife.com/"] img, :root a[href^="https://t.aslnk.link/"], :root a[href^="https://t.ajrkm3.com/"], :root a[href^="https://t.adating.link/"], :root a[href^="https://safesurfingtoday.com/"][href*="?skip="], :root a[href^="https://land.brazzersnetwork.com/landing/"], :root a[href^="https://t.acam.link/"], :root a[href*="//daichoho.com/"], :root a[href^="https://syndication.optimizesrv.com/"], :root a[href^="https://go.trackitalltheway.com/"], :root [href^="https://track.fiverr.com/visit/"] > img, :root a[href^="https://syndication.exoclick.com/"], :root a[href^="https://syndication.dynsrvtbg.com/"], :root div[data-alias="300x250 Ad 1"], :root a[href^="https://syndicate.contentsserved.com/"], :root a[href^="https://svb-analytics.trackerrr.com/"], :root a[href^="https://streamate.com/landing/click/"], :root a[href^="https://ad.doubleclick.net/"], :root a[href^="https://static.fleshlight.com/images/banners/"], :root a[href^="https://slkmis.com/"], :root a[href^="https://s.zlink3.com/"], :root a[href^="https://www.mrskin.com/account/"], :root a[href^="https://s.optzsrv.com/"], :root a[href^="https://random-affiliate.atimaze.com/"], :root a[href^="https://quotationfirearmrevision.com/"], :root a[href^="https://pubads.g.doubleclick.net/"], :root a[href^="https://ak.oalsauwy.net/"], :root a[href^="https://softwa.cfd/"], :root a[href^="https://play1ad.shop/"], :root a[href^="https://prf.hn/click/"][href*="/camref:"] > img, :root a[href^="https://www.dating-finder.com/?ai_d="], :root a[href^="https://serve.awmdelivery.com/"], :root a[href^="https://prf.hn/click/"][href*="/adref:"] > img, :root app-ad, :root a[href^="https://postback1win.com/"], :root a[href^="https://a.adtng.com/"], :root a[href^="https://playnano.online/offerwalls/?ref="], :root a[href^="https://www.privateinternetaccess.com/"] > img, :root a[href^="https://mmwebhandler.aff-online.com/"], :root a[href^="https://www.bet365.com/"][href*="affiliate="], :root a[href^="https://pb-track.com/"], :root a[href^="https://pb-front.com/"], :root a[href^="https://paid.outbrain.com/network/redir?"], :root a[href^="https://ngineet.cfd/"], :root a[href^="https://upsups.click/"], :root a[href^="https://ndt5.net/"], :root a[href^="http://eighteenderived.com/"], :root a[href^="https://natour.naughtyamerica.com/track/"], :root a[href^="https://mediaserver.entainpartners.com/renderBanner.do?"], :root a[href^="https://www.sugarinstant.com/?partner_id="], :root a[href^="https://m.do.co/c/"] > img, :root [data-ad-name], :root a[href^="https://loboclick.com/"], :root .nya-slot[style], :root a[href^="https://a.bestcontentweb.top/"], :root a[href^="https://lobimax.com/"], :root a[href^="https://lead1.pl/"], :root a[href^="https://landing1.brazzersnetwork.com"], :root a[href^="https://landing.brazzersnetwork.com/"], :root a[href^="https://join.virtuallust3d.com/"], :root a[href^="https://kiksajex.com/"], :root a[href^="https://juicyads.in/"], :root a[href^="https://www.mypornstarcams.com/landing/click/"], :root a[href^="https://snowdayonline.xyz/"], :root a[href^="https://mediaserver.gvcaffiliates.com/renderBanner.do?"], :root a[href^="https://join.dreamsexworld.com/"], :root a[href^="https://jaxofuna.com/"], :root a[href^="https://itubego.com/video-downloader/?affid="], :root a[href^="https://italarizege.xyz/"], :root a[href^="https://iqbroker.com/"][href*="?aff="], :root a[href^="https://hot-growngames.life/"], :root a[href^="https://golinks.work/"], :root a[href^="https://go.xxxvjmp.com/"], :root a[href^="https://s.deltraff.com/"], :root a[href^="https://zirdough.net/"], :root [class^="tile-picker__CitrusBannerContainer-sc-"], :root a[href^="https://go.xxxiijmp.com"], :root a[href^="https://go.xtbaffiliates.com/"], :root .OUTBRAIN[data-widget-id^="FMS_REELD_"], :root [data-role="tile-ads-module"], :root a[href^="https://go.xlviirdr.com"], :root a[href^="https://go.xlviiirdr.com"], :root a[href^="https://ismlks.com/"], :root [href^="https://www.mypillow.com/"] > img, :root a[href^="https://go.xlirdr.com"], :root [data-css-class="dfp-inarticle"], :root a[href^="https://l.hyenadata.com/"], :root a[href^="https://go.tmrjmp.com"], :root a[href^="https://go.skinstrip.net"][href*="?campaignId="], :root a[href^="https://go.markets.com/visit/?bta="], :root a[href^="https://billing.purevpn.com/aff.php"] > img, :root a[href^="https://go.hpyrdr.com/"], :root a[href^="https://lijavaxa.com/"], :root a[href^="https://go.goaserv.com/"], :root a[href^="https://t.hrtye.com/"], :root a[href^="https://go.etoro.com/"] > img, :root a[href^="https://go.dmzjmp.com"], :root div[class^="Display_displayAd"], :root a[href^="https://www.bang.com/?aff="], :root #mgb-container > #mgb, :root a[href^="https://go.admjmp.com"], :root div[id^="div-gpt-"], :root a[href^="https://gml-grp.com/"], :root a[href^="https://get.surfshark.net/aff_c?"][href*="&aff_id="] > img, :root a[href^="https://gamingadlt.com/?offer="], :root a[href^="https://www.adskeeper.com"], :root [href^="https://www.reimageplus.com/"], :root a[data-redirect^="https://paid.outbrain.com/network/redir?"], :root [href^="https://clicks.affstrack.com/"] > img, :root a[href^="https://ak.hauchiwu.com/"], :root a[href^="https://engine.phn.doublepimp.com/"], :root a[href^="https://engine.blueistheneworanges.com/"], :root a[href^="https://eergortu.net/"], :root a[href^="https://dl-protect.net/"], :root a[href^="https://rixofa.com/"], :root a[href^="https://disobediencecalculatormaiden.com/"], :root a[href^="https://datingoffers30.info/"], :root a[href*=".foxqck.com/"], :root a[href^="https://ctosrd.com/"], :root a[href^="https://clixtrac.com/"], :root [href^="https://noqreport.com/"] > img, :root a[href^="https://clicks.pipaffiliates.com/"], :root a[href^="https://datewhisper.life/"], :root a[href^="https://get-link.xyz/"], :root a[href^="https://click.linksynergy.com/fs-bin/"] > img, :root a[href^="https://combodef.com/"], :root AD-TRIPLE-BOX, :root a[href^="https://click.hoolig.app/"], :root a[href^="https://track.totalav.com/"], :root img[src^="https://images.purevpnaffiliates.com"], :root a[href^="https://porntubemate.com/"], :root a[href^="https://clickadilla.com/"], :root a[href^="https://click.dtiserv2.com/"], :root a[href^="https://go.xlvirdr.com"], :root a[href^="http://www.iyalc.com/"], :root a[href^="https://claring-loccelkin.com/"], :root a[href^="https://s.ma3ion.com/"], :root a[href^="https://cams.imagetwist.com/in/?track="], :root a[href^="https://bongacams2.com/track?"], :root a[href^="https://t.ajrkm1.com/"], :root [href="https://masstortfinancing.com"] img, :root a[href^="https://bongacams10.com/track?"], :root a[href*=".g2afse.com/"], :root a[href^="https://bodelen.com/"], :root a[target="_blank"][onmousedown="this.href^='http://paid.outbrain.com/network/redir?"], :root a[href^="https://banners.livepartners.com/"], :root a[href^="http://revolvemockerycopper.com/"], :root a[href^="https://awptjmp.com/"], :root a[href^="https://join.sexworld3d.com/track/"], :root a[href^="https://intenseaffiliates.com/redirect/"], :root a[href^="https://aweptjmp.com/"], :root [class^="s2nPlayer"], :root a[href^="https://chaturbate.jjgirls.com/?track="], :root a[href^="https://ausoafab.net/"], :root a[href^="https://activate-game.com/"], :root .scroll-fixable.rail-right > .deals-rail, :root [data-wpas-zoneid], :root a[href^="https://a2.adform.net/"], :root a[href^="https://auesk.cfd/"], :root a[href^="https://ak.psaltauw.net/"], :root a[href^="https://adclick.g.doubleclick.net/"], :root div[id^="ad-position-"], :root a[href^="https://leg.xyz/?track="], :root a[href^="https://www.toprevenuegate.com/"], :root a[href^="https://bc.game/"], :root a[href^="https://a.bestcontentoperation.top/"], :root a[href^="https://adultfriendfinder.com/go/"], :root a[href^="https://ads.planetwin365affiliate.com/"], :root a[href^="https://ads.leovegas.com/"], :root a[href^="https://a.candyai.love/"], :root [data-m-ad-id], :root a[href^="https://a-ads.com/"], :root div[id^="rc-widget-"], :root a[href^="http://eslp34af.click/"], :root a[href^="https://turnstileunavailablesite.com/"], :root a[href^="https://chaturbate.com/in/?"], :root [href^="https://freecourseweb.com/"] > .sitefriend, :root a[href^="https://prf.hn/click/"][href*="/creativeref:"] > img, :root a[href*="&maxads="], :root a[href^="http://www.adultempire.com/unlimited/promo?"][href*="&partner_id="], :root a[href^="https://1betandgonow.com/"], :root a[href^="https://www.googleadservices.com/pagead/aclk?"], :root a[href^="http://www.mrskin.com/tour"], :root a[href^="http://www.friendlyduck.com/AF_"], :root a[href^="https://getvideoz.click/"], :root a[href^="http://troopsassistedstupidity.com/"], :root a[href^="http://trk.globwo.online/"], :root a-ad, :root a[href^="https://offhandpump.com/"], :root a[href^="http://stickingrepute.com/"], :root #slashboxes > .deals-rail, :root a[href^="http://premonitioninventdisagree.com/"], :root a[href^="http://naggingirresponsible.com/"], :root a[href^="https://in.rabbtrk.com/"], :root div[data-ad-targeting], :root a[href^="https://hotplaystime.life/"], :root a[href^="http://www.h4trck.com/"], :root a[href^="https://81ac.xyz/"], :root a[href^="http://guestblackmail.com/"], :root a[href^="http://cam4com.go2cloud.org/aff_c?"], :root a[href^="https://ads.betfair.com/redirect.aspx?"], :root a[href^="https://ad.kubiccomps.icu/"], :root [href^="https://www.mypatriotsupply.com/"] > img, :root a[href^="https://trk.softonixs.xyz/"], :root a[href^="https://sexynearme.com/"], :root a[href^="https://myclick-2.com/"], :root a[href^="http://dragnag.com/"], :root [id^="div-gpt-ad"], :root .ob_container .item-container-obpd, :root div[id^="yandex_ad"], :root a[href^="https://www8.smartadserver.com/"], :root a[href^="https://pb-imc.com/"], :root a[href^="http://deskfrontfreely.com/"], :root a[href^="https://track.adform.net/"], :root a[href^="http://avthelkp.net/"], :root a[href^="https://a.medfoodhome.com/"], :root a[href^="https://engine.flixtrial.com/"], :root [data-type="ad-vertical"], :root a[href^="http://annulmentequitycereals.com/"], :root a[href^="//startgaming.net/tienda/" i], :root a[href^="https://www.get-express-vpn.com/offer/"], :root a[href^="//s.st1net.com/splash.php"], :root a[href^="https://join.virtualtaboo.com/track/"], :root [id^="ad_sky"], :root a[href^="http://coefficienttolerategravel.com/"], :root a[href^="https://a.medfoodsafety.com/"], :root a[href^="//go.eabids.com/"], :root a[href^=" https://www.friendlyduck.com/AF_"], :root a[href*="/jump/next.php?r="], :root [href^="https://ilovemyfreedoms.com/landing-"], :root a[href^="https://go.nordvpn.net/aff"] > img, :root .\[\&_\.gdprAdTransparencyCogWheelButton\]\:\!pjra-z-\[5\], :root [href^="http://clicks.totemcash.com/"], :root a[href^="https://ad.zanox.com/ppc/"] > img, :root [data-d-ad-id], :root a[href*=".engine.adglare.net/"], :root [href^="https://www.profitablegatecpm.com/"], :root div[id^="lazyad-"], :root a[href^="http://com-1.pro/"], :root a[href*=".cfm?domain="][href*="&fp="], :root [data-dynamic-ads], :root a[href^="https://xbet-4.com/"], :root a[data-widget-outbrain-redirect^="http://paid.outbrain.com/network/redir?"], :root [data-ad-width], :root [data-block-type="ad"], :root [href^="https://join.playboyplus.com/track/"], :root a[data-url^="http://paid.outbrain.com/network/redir?"] + .author, :root a[href^="https://ab.advertiserurl.com/aff/"], :root a[data-oburl^="https://paid.outbrain.com/network/redir?"], :root a[href^="https://trk.sportsflix4k.club/"], :root a[href^="http://dragfault.com/"], :root [href^="https://cpa.10kfreesilver.com/"], :root a[href^="https://a.bestcontentfood.top/"], :root a[data-obtrack^="http://paid.outbrain.com/network/redir?"], :root a[data-href^="http://ads.trafficjunky.net/"], :root a[href^="https://go.xlivrdr.com"], :root [onclick^="location.href='https://1337x.vpnonly.site/"], :root [name^="google_ads_iframe"], :root [id^="section-ad-banner"], :root [data-advadstrackid], :root a[href^="http://muzzlematrix.com/"], :root [href^="https://zone.gotrackier.com/"], :root [href^="https://www.restoro.com/"], :root a[href^="https://bngpt.com/"], :root a[href^="https://www.sheetmusicplus.com/"][href*="?aff_id="], :root a[href^="http://adultfriendfinder.com/go/"], :root a[href^="https://fastestvpn.com/lifetime-special-deal?a_aid="], :root a[href^="https://tour.mrskin.com/"], :root citrus-ad-wrapper, :root a[onmousedown^="this.href='https://paid.outbrain.com/network/redir?"][target="_blank"], :root a[href^="https://go.grinsbest.com/"], :root a[href^="https://vo2.qrlsx.com/"], :root [href^="https://www.avantlink.com/click.php"] img, :root a[href^="https://losingoldfry.com/"], :root [href^="https://routewebtk.com/"], :root a[href^="https://t.ajump1.com/"], :root span[data-ez-ph-id], :root [href^="https://track.aftrk1.com/"], :root div[id^="adngin-"], :root [data-rc-widget], :root a[href^="https://go.hpyjmp.com"], :root [href^="https://mystore.com/"] > img, :root div[id^="div-ads-"], :root [href^="https://rapidgator.net/article/premium/ref/"], :root [href^="https://join.girlsoutwest.com/"], :root [href^="https://join3.bannedsextapes.com"], :root a[href^="https://go.xxxijmp.com"], :root [href^="https://istlnkcl.com/"], :root div[data-adunit], :root app-large-ad, :root [href^="https://turtlebids.irauctions.com/"] img, :root [href^="https://wct.link/click?"], :root [href^="https://go.xlrdr.com"], :root a[href^="https://tm-offers.gamingadult.com/"], :root [href^="https://charmingdatings.life/"], :root [href^="https://glersakr.com/"], :root [href^="https://v.investologic.co.uk/"], :root a[href^="https://www.goldenfrog.com/vyprvpn?offer_id="][href*="&aff_id="], :root [id^="ad-wrap-"], :root a[href*="//jjgirls.com/sex/Chaturbate"], :root [data-id^="div-gpt-ad"], :root a[href^="https://tracker.loropartners.com/"], :root [href^="https://awbbjmp.com/"], :root a[href*=".adsrv.eacdn.com/"], :root [href^="https://antiagingbed.com/discount/"] > img, :root [href^="https://www.brighteonstore.com/products/"] img, :root a[href^="https://bngprm.com/"], :root [href^="https://shiftnetwork.infusionsoft.com/go/"] > img, :root a[href^="https://go.strpjmp.com/"], :root a[href^="https://go.bushheel.com/"], :root a[href^="https://ctjdwm.com/"], :root a[href^="https://camfapr.com/landing/click/"], :root [href="//sexcams.plus/"], :root [href^="http://www.mypillow.com/"] > img, :root [href^="https://www.targetingpartner.com/"], :root div[class^="Adstyled__AdWrapper-"], :root a[href^="https://startgaming.net/tienda/" i], :root .section-subheader > .section-hotel-prices-header, :root [href^="https://www.hostg.xyz/"] > img, :root #kt_player > a[target="_blank"], :root a[href^="http://bongacams.com/track?"], :root [href^="http://mypillow.com/"] > img, :root [href="https://ourgoldguy.com/contact/"] img, :root [href="https://www.masstortfinancing.com/"] > img, :root a[href^="https://go.rmhfrtnd.com/"], :root [href="https://jdrucker.com/gold"] > img, :root [href^="https://ad.admitad.com/"], :root [href^="https://mypillow.com/"] > img, :root [data-testid="ad_testID"], :root a[href^="http://handgripvegetationhols.com/"], :root [class^="amp-ad-"], :root a[href^="http://tc.tradetracker.net/"] > img, :root [data-ez-name], :root a[href^="https://black77854.com/"], :root [data-revive-zoneid] > iframe, :root [data-testid="adBanner-wrapper"], :root [href^="https://mylead.global/stl/"] > img, :root [href^="https://mypatriotsupply.com/"] > img, :root a[href^="https://witnessjacket.com/"], :root [data-mobile-ad-id], :root a[href^="https://fc.lc/ref/"], :root [data-adshim], :root topadblock, :root a[href^="//s.zlinkd.com/"], :root a[href^="https://bs.serving-sys.com"], :root a[href^="https://go.cmtaffiliates.com/"], :root [href^="https://optimizedelite.com/"] > img, :root [data-name="adaptiveConstructorAd"], :root a[href^="http://partners.etoro.com/"], :root [href^="https://goldcometals.com/clk.trk"], :root [data-desktop-ad-id], :root [href^="https://www.cloudways.com/en/?id"], :root a[href^="https://www.liquidfire.mobi/"], :root .grid > .container > #aside-promotion, :root DFP-AD, :root [id^="ad_slider"], :root [data-adbridg-ad-class], :root a[href^="https://linkboss.shop/"], :root [data-adblockkey], :root [onclick*="content.ad/"], :root [data-ad-manager-id], :root AMP-AD, :root [data-ad-cls], :root a[href^="https://6-partner.com/"], :root [href^="https://affiliate.fastcomet.com/"] > img, :root a[href^="https://go.mnaspm.com/"], :root [class^="adDisplay-module"], :root AD-SLOT, :root #kt_player > div[style="position: absolute; inset: 0px; z-index: 170;"], :root [data-freestar-ad][id], :root a[href^="https://go.xxxjmp.com"], :root #leader-companion > a[href], :root a[href^="http://www.adultdvdempire.com/?partner_id="][href*="&utm_"], :root [data-ad-module], :root app-advertisement, :root a[href^="https://getmatchedlocally.com/"], :root a[href^="https://clickins.slixa.com/"], :root [class^="div-gpt-ad"], :root a[href^="https://traffdaq.com/"], :root a[href^="https://cam4com.go2cloud.org/"], :root a[href^="http://li.blogtrottr.com/click?"], :root .ob_dual_right > .ob_ads_header ~ .odb_div { display: none !important; }</style><style data-make-styles-bucket="d"></style><style id="fui-FluentProviderr0"></style></head>
+
+<body class="fullcontent quarto-light" data-tabster="{&quot;root&quot;:{}}">
+
+<i tabindex="0" role="none" data-tabster-dummy="" aria-hidden="true" style="position: fixed; height: 1px; width: 1px; opacity: 0.001; z-index: -1; content-visibility: hidden; top: 0px; left: 0px;"></i><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Ligas e Times de Futebol (EDA)</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Guilherme Fernandes Monteiro </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introdução" class="level2">
+<h2 class="anchored" data-anchor-id="introdução">Introdução<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#introdu%C3%A7%C3%A3o" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<p>Este documento visa detalhar o scraping e pré-processamento dos dados, incluindo a carga dos dados, junção das tabelas e adição de colunas informativas.</p>
+</section>
+<section id="raspagem-dos-dados" class="level1">
+<h1>Raspagem dos Dados</h1>
+<p>Para a formação inicial do DataSet foi feita uma raspagem dinâmica dos dados utilizando Java e ferramentas de scraping tais quais:</p>
+<ul>
+<li><p>Selenium + JSoup e Postman;</p></li>
+<li><p>Extração direta no HTML quando a resposta da API não era visível;</p></li>
+</ul>
+<section id="iniciando-o-caminho" class="level2">
+<h2 class="anchored" data-anchor-id="iniciando-o-caminho">Iniciando o Caminho<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#iniciando-o-caminho" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb1-1" aria-hidden="true" tabindex="-1"></a>caminho <span class="ot">&lt;-</span> <span class="st">"pre_processamento/DBS.xlsx"</span>  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="função-para-pré-processamento" class="level1">
+<h1>Função para Pré-Processamento</h1>
+<p>Esta etápa visa sanar os príncipais problemas quando se trata de dados não tratados. Aqui, resolvemos problemas como:</p>
+<ul>
+<li><p>Troca de NA por 0;</p></li>
+<li><p>Conversão de valores para numérico;</p></li>
+<li><p>Junção de tabelas;</p></li>
+<li><p>Adição de colunas necessárias.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-1" aria-hidden="true" tabindex="-1"></a>preprocess_league_data <span class="ot">&lt;-</span> <span class="cf">function</span>(caminho, main, aux, <span class="at">add =</span> <span class="cn">NULL</span>, league) {</span>
+<span id="cb2-2"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-2" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-3"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-3" aria-hidden="true" tabindex="-1"></a>  main_df <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(caminho, <span class="at">sheet =</span> main)</span>
+<span id="cb2-4"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-4" aria-hidden="true" tabindex="-1"></a>  aux_df <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(caminho, <span class="at">sheet =</span> aux)</span>
+<span id="cb2-5"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-6"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># converter a coluna 'pay' para numérico</span></span>
+<span id="cb2-7"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-7" aria-hidden="true" tabindex="-1"></a>  aux_df <span class="ot">&lt;-</span> aux_df <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">pay =</span> <span class="fu">as.numeric</span>(pay))</span>
+<span id="cb2-8"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-8" aria-hidden="true" tabindex="-1"></a>  main_df <span class="ot">&lt;-</span> main_df <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">season_profit =</span> <span class="fu">as.numeric</span>(season_profit))</span>
+<span id="cb2-9"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-10"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-11"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># full join com o dataframe principal</span></span>
+<span id="cb2-12"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-12" aria-hidden="true" tabindex="-1"></a>  final_df <span class="ot">&lt;-</span> <span class="fu">full_join</span>(main_df, aux_df, <span class="at">by =</span> <span class="st">"cod"</span>)</span>
+<span id="cb2-13"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-14"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># se tiver adicional, realizamos mais uma junção</span></span>
+<span id="cb2-15"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(add)) {</span>
+<span id="cb2-16"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-16" aria-hidden="true" tabindex="-1"></a>    add_df <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(caminho, <span class="at">sheet =</span> add)</span>
+<span id="cb2-17"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-17" aria-hidden="true" tabindex="-1"></a>    final_df <span class="ot">&lt;-</span> <span class="fu">full_join</span>(final_df, add_df, <span class="at">by =</span> <span class="st">"cod"</span>)</span>
+<span id="cb2-18"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-19"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-20"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># substituir valores NA por 0</span></span>
+<span id="cb2-21"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-21" aria-hidden="true" tabindex="-1"></a>  final_df[<span class="fu">is.na</span>(final_df)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb2-22"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-23"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># adicionar nome da liga</span></span>
+<span id="cb2-24"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-24" aria-hidden="true" tabindex="-1"></a>  final_df <span class="ot">&lt;-</span> final_df <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">league_name =</span> league)</span>
+<span id="cb2-25"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-26"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(final_df)</span>
+<span id="cb2-27"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb2-27" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="verificação-dos-dados" class="level2">
+<h2 class="anchored" data-anchor-id="verificação-dos-dados">Verificação dos Dados<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#verifica%C3%A7%C3%A3o-dos-dados" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># verificação de tipos de dados</span></span>
+<span id="cb3-2"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [116 × 23] (S3: tbl_df/tbl/data.frame)
+ $ cod          : chr [1:116] "PAL" "GRE" "CAM" "FLA" ...
+ $ team         : chr [1:116] "Palmeiras" "Grêmio" "Atlético-MG" "Flamengo" ...
+ $ league_n     : num [1:116] 1 2 3 4 5 6 7 8 9 10 ...
+ $ league_cup   : chr [1:116] "L" "L" "L" "L" ...
+ $ league_cont  : chr [1:116] "L" "L" "L" "L" ...
+ $ league_title : num [1:116] 47000000 45400000 43000000 40600000 38200000 ...
+ $ tv_profit    : num [1:116] 1.63e+08 1.70e+08 1.21e+08 2.75e+08 1.12e+08 ...
+ $ season_profit: num [1:116] 2.10e+08 2.16e+08 1.64e+08 3.16e+08 1.51e+08 ...
+ $ pay          : num [1:116] 30 45426 45429 35 45486 ...
+ $ player_in    : num [1:116] 83.2 45.3 70.1 60 30.2 40.5 55 25.4 35.7 22.1 ...
+ $ player_out   : num [1:116] 342 80.5 95 120 25 60.2 78.5 50.3 65.1 30.4 ...
+ $ sponsor      : num [1:116] 81 30 20 85 27.5 0 20 16 30 20 ...
+ $ kit          : num [1:116] 45 20 18 60 12 10 25 15 22 8 ...
+ $ financial_fp : logi [1:116] TRUE TRUE FALSE TRUE FALSE TRUE ...
+ $ renda_19     : num [1:116] 6.54e+08 0.00 0.00 9.50e+08 0.00 0.00 0.00 0.00 0.00 0.00 ...
+ $ despesa_19   : num [1:116] 6.29e+08 0.00 0.00 5.95e+08 0.00 0.00 0.00 0.00 0.00 0.00 ...
+ $ renda_20     : num [1:116] 5.61e+08 0.00 0.00 6.68e+08 0.00 0.00 0.00 0.00 0.00 0.00 ...
+ $ despesa_20   : num [1:116] 6.14e+08 0.00 0.00 6.73e+08 0.00 0.00 0.00 0.00 0.00 0.00 ...
+ $ renda_21     : num [1:116] 7.1e+08 0.0 0.0 1.0e+09 0.0 0.0 0.0 0.0 0.0 0.0 ...
+ $ despesa_21   : num [1:116] 6.87e+08 0.00 0.00 9.50e+07 0.00 0.00 0.00 0.00 0.00 0.00 ...
+ $ renda_22     : num [1:116] 9.0e+08 0.0 0.0 1.2e+09 0.0 0.0 0.0 0.0 0.0 0.0 ...
+ $ despesa_22   : num [1:116] 8e+08 0e+00 0e+00 1e+09 0e+00 0e+00 0e+00 0e+00 0e+00 0e+00 ...
+ $ league_name  : chr [1:116] "Brasileirao(serieA)" "Brasileirao(serieA)" "Brasileirao(serieA)" "Brasileirao(serieA)" ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(df_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     cod                team              league_n      league_cup       
+ Length:116         Length:116         Min.   : 1.00   Length:116        
+ Class :character   Class :character   1st Qu.: 5.00   Class :character  
+ Mode  :character   Mode  :character   Median :10.00   Mode  :character  
+                                       Mean   :10.19                     
+                                       3rd Qu.:15.00                     
+                                       Max.   :20.00                     
+ league_cont         league_title         tv_profit         season_profit      
+ Length:116         Min.   :        0   Min.   : 28000000   Min.   : 38000000  
+ Class :character   1st Qu.: 10575000   1st Qu.: 58750000   1st Qu.: 77575000  
+ Mode  :character   Median : 30500000   Median : 85400000   Median :125093854  
+                    Mean   : 47885345   Mean   :154398856   Mean   :202284201  
+                    3rd Qu.: 64062500   3rd Qu.:170575000   3rd Qu.:247875000  
+                    Max.   :200400000   Max.   :843000000   Max.   :925800000  
+      pay             player_in        player_out        sponsor      
+ Min.   :    1.00   Min.   :  2.00   Min.   :  2.00   Min.   :  0.00  
+ 1st Qu.:   26.75   1st Qu.: 10.00   1st Qu.:  8.00   1st Qu.:  6.00  
+ Median :   50.00   Median : 24.00   Median : 21.00   Median : 12.00  
+ Mean   : 3593.16   Mean   : 37.99   Mean   : 37.82   Mean   : 28.17  
+ 3rd Qu.:   96.00   3rd Qu.: 45.80   3rd Qu.: 51.48   3rd Qu.: 25.62  
+ Max.   :45555.00   Max.   :275.00   Max.   :342.00   Max.   :225.00  
+      kit         financial_fp       renda_19           despesa_19       
+ Min.   :  0.50   Mode :logical   Min.   :        0   Min.   :        0  
+ 1st Qu.:  3.00   FALSE:21        1st Qu.:        0   1st Qu.:        0  
+ Median :  5.50   TRUE :95        Median :        0   Median :        0  
+ Mean   : 16.28                   Mean   : 48948276   Mean   : 46025862  
+ 3rd Qu.: 20.00                   3rd Qu.:        0   3rd Qu.:        0  
+ Max.   :200.00                   Max.   :950000000   Max.   :637000000  
+    renda_20           despesa_20           renda_21        
+ Min.   :        0   Min.   :        0   Min.   :0.000e+00  
+ 1st Qu.:        0   1st Qu.:        0   1st Qu.:0.000e+00  
+ Median :        0   Median :        0   Median :0.000e+00  
+ Mean   : 38974138   Mean   : 41612069   Mean   :4.619e+07  
+ 3rd Qu.:        0   3rd Qu.:        0   3rd Qu.:0.000e+00  
+ Max.   :668000000   Max.   :673000000   Max.   :1.000e+09  
+   despesa_21           renda_22           despesa_22        league_name       
+ Min.   :        0   Min.   :0.000e+00   Min.   :0.000e+00   Length:116        
+ 1st Qu.:        0   1st Qu.:0.000e+00   1st Qu.:0.000e+00   Class :character  
+ Median :        0   Median :0.000e+00   Median :0.000e+00   Mode  :character  
+ Mean   : 39318966   Mean   :5.642e+07   Mean   :5.354e+07                     
+ 3rd Qu.:        0   3rd Qu.:0.000e+00   3rd Qu.:0.000e+00                     
+ Max.   :687000000   Max.   :1.200e+09   Max.   :1.000e+09                     </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="colunas-adicionais-com-r" class="level1">
+<h1>Colunas Adicionais com R</h1>
+<p>Para adição de colunas adicionais essenciais para o algorítimo futuro de predição, foram utilizadas as bibliotecas Rvest, Stringer e Dplyr para raspagem de dados.</p>
+<section id="scraping" class="level2">
+<h2 class="anchored" data-anchor-id="scraping">Scraping<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#scraping" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<p>Realização do scraping a partir dos códigos CSS da página.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb7-1" aria-hidden="true" tabindex="-1"></a>matches_played <span class="ot">&lt;-</span> page <span class="sc">%&gt;%</span> <span class="fu">html_nodes</span>(<span class="st">"#yw1 &gt; table &gt; tbody &gt; tr &gt; td:nth-child(4)"</span>) <span class="sc">%&gt;%</span> <span class="fu">html_text</span>(<span class="at">trim =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">as.numeric</span>() </span>
+<span id="cb7-2"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb7-3" aria-hidden="true" tabindex="-1"></a>wins <span class="ot">&lt;-</span> page <span class="sc">%&gt;%</span> <span class="fu">html_nodes</span>(<span class="st">"#yw1 &gt; table &gt; tbody &gt; tr &gt; td:nth-child(5)"</span>) <span class="sc">%&gt;%</span> <span class="fu">html_text</span>(<span class="at">trim =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">as.numeric</span>() </span>
+<span id="cb7-4"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb7-5" aria-hidden="true" tabindex="-1"></a>draws <span class="ot">&lt;-</span> page <span class="sc">%&gt;%</span> <span class="fu">html_nodes</span>(<span class="st">"#yw1 &gt; table &gt; tbody &gt; tr &gt; td:nth-child(6)"</span>) <span class="sc">%&gt;%</span> <span class="fu">html_text</span>(<span class="at">trim =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">as.numeric</span>() </span>
+<span id="cb7-6"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb7-7" aria-hidden="true" tabindex="-1"></a>losses <span class="ot">&lt;-</span> page <span class="sc">%&gt;%</span> <span class="fu">html_nodes</span>(<span class="st">"#yw1 &gt; table &gt; tbody &gt; tr &gt; td:nth-child(7)"</span>) <span class="sc">%&gt;%</span> <span class="fu">html_text</span>(<span class="at">trim =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">as.numeric</span>() </span>
+<span id="cb7-8"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb7-9" aria-hidden="true" tabindex="-1"></a>goals <span class="ot">&lt;-</span> page <span class="sc">%&gt;%</span> <span class="fu">html_nodes</span>(<span class="st">"#yw1 &gt; table &gt; tbody &gt; tr &gt; td:nth-child(8)"</span>) <span class="sc">%&gt;%</span> <span class="fu">html_text</span>(<span class="at">trim =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>As informações adicionais foram coletadas de um site famoso por revelar estatísticas dos times das principais ligas ao redor do muno. Recomendo explorar para mais informações sobre nosso DataSet.</p>
+<p><a href="https://www.transfermarkt.com/">Link.</a></p>
+</section>
+</section>
+<section id="dataframe-final" class="level1">
+<h1>DataFrame Final</h1>
+<p>Por fim, após coletar as informações bastou juntar as colunas, além da formatação da coluna de gols para criação de duas colunas.</p>
+</section>
+<section id="verificação-final-da-tipagem-dos-dados" class="level1">
+<h1>Verificação Final da Tipagem dos Dados</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [116 × 29] (S3: tbl_df/tbl/data.frame)
+ $ cod           : chr [1:116] "PAL" "GRE" "CAM" "FLA" ...
+ $ team          : chr [1:116] "Palmeiras" "Grêmio" "Atlético-MG" "Flamengo" ...
+ $ league_n      : num [1:116] 1 2 3 4 5 6 7 8 9 10 ...
+ $ league_cup    : chr [1:116] "L" "L" "L" "L" ...
+ $ league_cont   : chr [1:116] "L" "L" "L" "L" ...
+ $ league_title  : num [1:116] 47000000 45400000 43000000 40600000 38200000 ...
+ $ tv_profit     : num [1:116] 1.63e+08 1.70e+08 1.21e+08 2.75e+08 1.12e+08 ...
+ $ season_profit : num [1:116] 2.10e+08 2.16e+08 1.64e+08 3.16e+08 1.51e+08 ...
+ $ pay           : num [1:116] 30 45426 45429 35 45486 ...
+ $ player_in     : num [1:116] 83.2 45.3 70.1 60 30.2 40.5 55 25.4 35.7 22.1 ...
+ $ player_out    : num [1:116] 342 80.5 95 120 25 60.2 78.5 50.3 65.1 30.4 ...
+ $ sponsor       : num [1:116] 81 30 20 85 27.5 0 20 16 30 20 ...
+ $ kit           : num [1:116] 45 20 18 60 12 10 25 15 22 8 ...
+ $ financial_fp  : logi [1:116] TRUE TRUE FALSE TRUE FALSE TRUE ...
+ $ renda_19      : num [1:116] 6.54e+08 0.00 0.00 9.50e+08 0.00 0.00 0.00 0.00 0.00 0.00 ...
+ $ despesa_19    : num [1:116] 6.29e+08 0.00 0.00 5.95e+08 0.00 0.00 0.00 0.00 0.00 0.00 ...
+ $ renda_20      : num [1:116] 5.61e+08 0.00 0.00 6.68e+08 0.00 0.00 0.00 0.00 0.00 0.00 ...
+ $ despesa_20    : num [1:116] 6.14e+08 0.00 0.00 6.73e+08 0.00 0.00 0.00 0.00 0.00 0.00 ...
+ $ renda_21      : num [1:116] 7.1e+08 0.0 0.0 1.0e+09 0.0 0.0 0.0 0.0 0.0 0.0 ...
+ $ despesa_21    : num [1:116] 6.87e+08 0.00 0.00 9.50e+07 0.00 0.00 0.00 0.00 0.00 0.00 ...
+ $ renda_22      : num [1:116] 9.0e+08 0.0 0.0 1.2e+09 0.0 0.0 0.0 0.0 0.0 0.0 ...
+ $ despesa_22    : num [1:116] 8e+08 0e+00 0e+00 1e+09 0e+00 0e+00 0e+00 0e+00 0e+00 0e+00 ...
+ $ league_name   : chr [1:116] "Brasileirao(serieA)" "Brasileirao(serieA)" "Brasileirao(serieA)" "Brasileirao(serieA)" ...
+ $ matches_played: num [1:116] 38 38 38 38 38 38 38 38 38 38 ...
+ $ goals_scored  : num [1:116] 64 63 52 56 58 49 51 51 46 45 ...
+ $ goals_received: num [1:116] 33 56 32 42 37 35 47 43 45 44 ...
+ $ wins          : num [1:116] 20 21 19 19 18 17 16 14 15 15 ...
+ $ draws         : num [1:116] 10 5 9 9 10 11 8 14 10 9 ...
+ $ losses        : num [1:116] 8 12 10 10 10 10 14 10 13 14 ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(df_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     cod                team              league_n      league_cup       
+ Length:116         Length:116         Min.   : 1.00   Length:116        
+ Class :character   Class :character   1st Qu.: 5.00   Class :character  
+ Mode  :character   Mode  :character   Median :10.00   Mode  :character  
+                                       Mean   :10.19                     
+                                       3rd Qu.:15.00                     
+                                       Max.   :20.00                     
+ league_cont         league_title         tv_profit         season_profit      
+ Length:116         Min.   :        0   Min.   : 28000000   Min.   : 38000000  
+ Class :character   1st Qu.: 10575000   1st Qu.: 58750000   1st Qu.: 77575000  
+ Mode  :character   Median : 30500000   Median : 85400000   Median :125093854  
+                    Mean   : 47885345   Mean   :154398856   Mean   :202284201  
+                    3rd Qu.: 64062500   3rd Qu.:170575000   3rd Qu.:247875000  
+                    Max.   :200400000   Max.   :843000000   Max.   :925800000  
+      pay             player_in        player_out        sponsor      
+ Min.   :    1.00   Min.   :  2.00   Min.   :  2.00   Min.   :  0.00  
+ 1st Qu.:   26.75   1st Qu.: 10.00   1st Qu.:  8.00   1st Qu.:  6.00  
+ Median :   50.00   Median : 24.00   Median : 21.00   Median : 12.00  
+ Mean   : 3593.16   Mean   : 37.99   Mean   : 37.82   Mean   : 28.17  
+ 3rd Qu.:   96.00   3rd Qu.: 45.80   3rd Qu.: 51.48   3rd Qu.: 25.62  
+ Max.   :45555.00   Max.   :275.00   Max.   :342.00   Max.   :225.00  
+      kit         financial_fp       renda_19           despesa_19       
+ Min.   :  0.50   Mode :logical   Min.   :        0   Min.   :        0  
+ 1st Qu.:  3.00   FALSE:21        1st Qu.:        0   1st Qu.:        0  
+ Median :  5.50   TRUE :95        Median :        0   Median :        0  
+ Mean   : 16.28                   Mean   : 48948276   Mean   : 46025862  
+ 3rd Qu.: 20.00                   3rd Qu.:        0   3rd Qu.:        0  
+ Max.   :200.00                   Max.   :950000000   Max.   :637000000  
+    renda_20           despesa_20           renda_21        
+ Min.   :        0   Min.   :        0   Min.   :0.000e+00  
+ 1st Qu.:        0   1st Qu.:        0   1st Qu.:0.000e+00  
+ Median :        0   Median :        0   Median :0.000e+00  
+ Mean   : 38974138   Mean   : 41612069   Mean   :4.619e+07  
+ 3rd Qu.:        0   3rd Qu.:        0   3rd Qu.:0.000e+00  
+ Max.   :668000000   Max.   :673000000   Max.   :1.000e+09  
+   despesa_21           renda_22           despesa_22        league_name       
+ Min.   :        0   Min.   :0.000e+00   Min.   :0.000e+00   Length:116        
+ 1st Qu.:        0   1st Qu.:0.000e+00   1st Qu.:0.000e+00   Class :character  
+ Median :        0   Median :0.000e+00   Median :0.000e+00   Mode  :character  
+ Mean   : 39318966   Mean   :5.642e+07   Mean   :5.354e+07                     
+ 3rd Qu.:        0   3rd Qu.:0.000e+00   3rd Qu.:0.000e+00                     
+ Max.   :687000000   Max.   :1.200e+09   Max.   :1.000e+09                     
+ matches_played   goals_scored   goals_received        wins      
+ Min.   :34.00   Min.   :26.00   Min.   : 22.00   Min.   : 2.00  
+ 1st Qu.:34.00   1st Qu.:40.00   1st Qu.: 42.00   1st Qu.: 9.00  
+ Median :38.00   Median :49.00   Median : 50.50   Median :13.00  
+ Mean   :36.76   Mean   :51.72   Mean   : 51.72   Mean   :13.54  
+ 3rd Qu.:38.00   3rd Qu.:58.50   3rd Qu.: 60.25   3rd Qu.:18.00  
+ Max.   :38.00   Max.   :96.00   Max.   :104.00   Max.   :29.00  
+     draws            losses     
+ Min.   : 3.000   Min.   : 0.00  
+ 1st Qu.: 8.000   1st Qu.:10.00  
+ Median : 9.000   Median :14.00  
+ Mean   : 9.672   Mean   :13.54  
+ 3rd Qu.:11.000   3rd Qu.:17.00  
+ Max.   :19.000   Max.   :28.00  </code></pre>
+</div>
+</div>
+<section id="visualização-final" class="level2">
+<h2 class="anchored" data-anchor-id="visualização-final">Visualização Final<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#visualiza%C3%A7%C3%A3o-final" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<table class="table table-striped table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">cod</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">team</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_n</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cup</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cont</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_title</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">tv_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">season_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pay</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_in</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_out</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sponsor</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">kit</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">financial_fp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_22</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_22</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_name</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">matches_played</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_scored</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_received</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">wins</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">draws</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">losses</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">PAL</td>
+<td style="text-align: left;">Palmeiras</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">47000000</td>
+<td style="text-align: right;">162600000</td>
+<td style="text-align: right;">209600000</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">83.2</td>
+<td style="text-align: right;">342.0</td>
+<td style="text-align: right;">81.0</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">6.54e+08</td>
+<td style="text-align: right;">6.29e+08</td>
+<td style="text-align: right;">5.61e+08</td>
+<td style="text-align: right;">6.14e+08</td>
+<td style="text-align: right;">7.1e+08</td>
+<td style="text-align: right;">6.87e+08</td>
+<td style="text-align: right;">9.0e+08</td>
+<td style="text-align: right;">8e+08</td>
+<td style="text-align: left;">Brasileirao(serieA)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">GRE</td>
+<td style="text-align: left;">Grêmio</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">45400000</td>
+<td style="text-align: right;">170100000</td>
+<td style="text-align: right;">215500000</td>
+<td style="text-align: right;">45426</td>
+<td style="text-align: right;">45.3</td>
+<td style="text-align: right;">80.5</td>
+<td style="text-align: right;">30.0</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: right;">0e+00</td>
+<td style="text-align: left;">Brasileirao(serieA)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CAM</td>
+<td style="text-align: left;">Atlético-MG</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">43000000</td>
+<td style="text-align: right;">121200000</td>
+<td style="text-align: right;">164200000</td>
+<td style="text-align: right;">45429</td>
+<td style="text-align: right;">70.1</td>
+<td style="text-align: right;">95.0</td>
+<td style="text-align: right;">20.0</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: right;">0e+00</td>
+<td style="text-align: left;">Brasileirao(serieA)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FLA</td>
+<td style="text-align: left;">Flamengo</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">40600000</td>
+<td style="text-align: right;">275200000</td>
+<td style="text-align: right;">315800000</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">60.0</td>
+<td style="text-align: right;">120.0</td>
+<td style="text-align: right;">85.0</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">9.50e+08</td>
+<td style="text-align: right;">5.95e+08</td>
+<td style="text-align: right;">6.68e+08</td>
+<td style="text-align: right;">6.73e+08</td>
+<td style="text-align: right;">1.0e+09</td>
+<td style="text-align: right;">9.50e+07</td>
+<td style="text-align: right;">1.2e+09</td>
+<td style="text-align: right;">1e+09</td>
+<td style="text-align: left;">Brasileirao(serieA)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BOT</td>
+<td style="text-align: left;">Botafogo</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">38200000</td>
+<td style="text-align: right;">112500000</td>
+<td style="text-align: right;">150700000</td>
+<td style="text-align: right;">45486</td>
+<td style="text-align: right;">30.2</td>
+<td style="text-align: right;">25.0</td>
+<td style="text-align: right;">27.5</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: right;">0e+00</td>
+<td style="text-align: left;">Brasileirao(serieA)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BRA</td>
+<td style="text-align: left;">Bragantino</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">35800000</td>
+<td style="text-align: right;">85800000</td>
+<td style="text-align: right;">121600000</td>
+<td style="text-align: right;">45327</td>
+<td style="text-align: right;">40.5</td>
+<td style="text-align: right;">60.2</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: right;">0e+00</td>
+<td style="text-align: left;">Brasileirao(serieA)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">10</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table class="table table-striped table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">cod</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">team</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_n</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cup</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cont</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_title</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">tv_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">season_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pay</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_in</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_out</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sponsor</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">kit</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">financial_fp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_22</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_22</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_name</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">matches_played</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_scored</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_received</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">wins</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">draws</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">losses</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">PSG</td>
+<td style="text-align: left;">Paris Saint Germain</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">W</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">6.0e+07</td>
+<td style="text-align: right;">8.07e+08</td>
+<td style="text-align: right;">8.67e+08</td>
+<td style="text-align: right;">728</td>
+<td style="text-align: right;">147</td>
+<td style="text-align: right;">121</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">40.0</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">6.37e+08</td>
+<td style="text-align: right;">6.37e+08</td>
+<td style="text-align: right;">5.40e+08</td>
+<td style="text-align: right;">5.00e+08</td>
+<td style="text-align: right;">5.56e+08</td>
+<td style="text-align: right;">4.84e+08</td>
+<td style="text-align: right;">6.54e+08</td>
+<td style="text-align: right;">6.2e+08</td>
+<td style="text-align: left;">Ligue 1</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MON</td>
+<td style="text-align: left;">Monaco</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">4.8e+07</td>
+<td style="text-align: right;">1.11e+08</td>
+<td style="text-align: right;">1.59e+08</td>
+<td style="text-align: right;">89</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">104</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">5.0</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">1.96e+08</td>
+<td style="text-align: right;">2.03e+08</td>
+<td style="text-align: right;">1.48e+08</td>
+<td style="text-align: right;">1.55e+08</td>
+<td style="text-align: right;">1.47e+08</td>
+<td style="text-align: right;">1.63e+08</td>
+<td style="text-align: right;">2.20e+08</td>
+<td style="text-align: right;">2.0e+08</td>
+<td style="text-align: left;">Ligue 1</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">68</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BRE</td>
+<td style="text-align: left;">Brestois</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">4.7e+07</td>
+<td style="text-align: right;">2.80e+07</td>
+<td style="text-align: right;">7.50e+07</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: left;">Ligue 1</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LIL</td>
+<td style="text-align: left;">Lille</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">4.0e+07</td>
+<td style="text-align: right;">1.07e+08</td>
+<td style="text-align: right;">1.47e+08</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">78</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">4.0</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: left;">Ligue 1</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NIC</td>
+<td style="text-align: left;">Nice</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">3.8e+07</td>
+<td style="text-align: right;">9.80e+07</td>
+<td style="text-align: right;">1.36e+08</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: left;">Ligue 1</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LYO</td>
+<td style="text-align: left;">Lyon</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">3.2e+07</td>
+<td style="text-align: right;">1.99e+08</td>
+<td style="text-align: right;">2.31e+08</td>
+<td style="text-align: right;">92</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">7.0</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.0e+00</td>
+<td style="text-align: left;">Ligue 1</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">13</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table class="table table-striped table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">cod</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">team</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_n</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cup</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cont</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_title</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">tv_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">season_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pay</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_in</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_out</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sponsor</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">kit</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">financial_fp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_22</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_22</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_name</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">matches_played</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_scored</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_received</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">wins</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">draws</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">losses</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">INT</td>
+<td style="text-align: left;">Internazionale</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">23400000</td>
+<td style="text-align: right;">3.96e+08</td>
+<td style="text-align: right;">419400000</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: right;">76</td>
+<td style="text-align: right;">93</td>
+<td style="text-align: right;">160.0</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Camp Italiano(SerieA TIM)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">89</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MIL</td>
+<td style="text-align: left;">Milan</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">19400000</td>
+<td style="text-align: right;">4.00e+08</td>
+<td style="text-align: right;">419400000</td>
+<td style="text-align: right;">130</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">94.2</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Camp Italiano(SerieA TIM)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">76</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BOL</td>
+<td style="text-align: left;">Bologna</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">16800000</td>
+<td style="text-align: right;">6.50e+07</td>
+<td style="text-align: right;">81800000</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">10.0</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Camp Italiano(SerieA TIM)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JUV</td>
+<td style="text-align: left;">Juventus</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">W</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">18700000</td>
+<td style="text-align: right;">4.60e+08</td>
+<td style="text-align: right;">478700000</td>
+<td style="text-align: right;">170</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">120.0</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Camp Italiano(SerieA TIM)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ATA</td>
+<td style="text-align: left;">Atalanta</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">W</td>
+<td style="text-align: right;">21100000</td>
+<td style="text-align: right;">1.19e+08</td>
+<td style="text-align: right;">140100000</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">18.0</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Camp Italiano(SerieA TIM)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ROM</td>
+<td style="text-align: left;">Roma</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">10900000</td>
+<td style="text-align: right;">2.24e+08</td>
+<td style="text-align: right;">234900000</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">50.0</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Camp Italiano(SerieA TIM)</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">11</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table class="table table-striped table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">cod</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">team</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_n</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cup</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cont</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_title</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">tv_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">season_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pay</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_in</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_out</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sponsor</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">kit</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">financial_fp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_22</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_22</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_name</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">matches_played</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_scored</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_received</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">wins</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">draws</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">losses</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">RMA</td>
+<td style="text-align: left;">Real Madrid</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">W</td>
+<td style="text-align: right;">82800000</td>
+<td style="text-align: right;">8.43e+08</td>
+<td style="text-align: right;">925800000</td>
+<td style="text-align: right;">340</td>
+<td style="text-align: right;">124</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">225.0</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">La Liga</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">87</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BAR</td>
+<td style="text-align: left;">Barcelona</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">54100000</td>
+<td style="text-align: right;">8.06e+08</td>
+<td style="text-align: right;">860100000</td>
+<td style="text-align: right;">325</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">180.0</td>
+<td style="text-align: right;">165</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">La Liga</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">GIR</td>
+<td style="text-align: left;">Girona FC</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">46900000</td>
+<td style="text-align: right;">6.00e+07</td>
+<td style="text-align: right;">106900000</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">10.0</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">La Liga</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ATL</td>
+<td style="text-align: left;">Atlético de Madrid</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">39700000</td>
+<td style="text-align: right;">3.78e+08</td>
+<td style="text-align: right;">417700000</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">106.1</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">La Liga</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ATH</td>
+<td style="text-align: left;">Atlético de Bilbao</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">W</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">32400000</td>
+<td style="text-align: right;">1.13e+08</td>
+<td style="text-align: right;">145400000</td>
+<td style="text-align: right;">95</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">8.0</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">La Liga</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RSO</td>
+<td style="text-align: left;">Real Sociedad</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">25200000</td>
+<td style="text-align: right;">1.11e+08</td>
+<td style="text-align: right;">136200000</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">12.0</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">La Liga</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">10</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table class="table table-striped table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">cod</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">team</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_n</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cup</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cont</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_title</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">tv_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">season_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pay</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_in</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_out</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sponsor</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">kit</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">financial_fp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_22</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_22</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_name</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">matches_played</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_scored</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_received</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">wins</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">draws</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">losses</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">MCC</td>
+<td style="text-align: left;">Manchester City</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">W</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">176200000</td>
+<td style="text-align: right;">7.13e+08</td>
+<td style="text-align: right;">889200000</td>
+<td style="text-align: right;">220</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">5.35e+08</td>
+<td style="text-align: right;">5.10e+08</td>
+<td style="text-align: right;">4.78e+08</td>
+<td style="text-align: right;">5.10e+08</td>
+<td style="text-align: right;">5.69e+08</td>
+<td style="text-align: right;">5.28e+08</td>
+<td style="text-align: right;">6.13e+08</td>
+<td style="text-align: right;">5.60e+08</td>
+<td style="text-align: left;">Premier League</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ARS</td>
+<td style="text-align: left;">Arsenal</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">172200000</td>
+<td style="text-align: right;">6.48e+08</td>
+<td style="text-align: right;">820200000</td>
+<td style="text-align: right;">160</td>
+<td style="text-align: right;">95</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: left;">Premier League</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">91</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LIV</td>
+<td style="text-align: left;">Liverpool</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">168300000</td>
+<td style="text-align: right;">5.94e+08</td>
+<td style="text-align: right;">762300000</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">5.33e+08</td>
+<td style="text-align: right;">4.78e+08</td>
+<td style="text-align: right;">4.90e+08</td>
+<td style="text-align: right;">4.69e+08</td>
+<td style="text-align: right;">4.87e+08</td>
+<td style="text-align: right;">4.96e+08</td>
+<td style="text-align: right;">5.94e+08</td>
+<td style="text-align: right;">5.45e+08</td>
+<td style="text-align: left;">Premier League</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AVL</td>
+<td style="text-align: left;">Aston Villa</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">164300000</td>
+<td style="text-align: right;">5.50e+08</td>
+<td style="text-align: right;">714300000</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: left;">Premier League</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">76</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TOT</td>
+<td style="text-align: left;">Tottenham</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">162900000</td>
+<td style="text-align: right;">5.12e+08</td>
+<td style="text-align: right;">674900000</td>
+<td style="text-align: right;">160</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: right;">0.00e+00</td>
+<td style="text-align: left;">Premier League</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CHE</td>
+<td style="text-align: left;">Chelsea</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">149700000</td>
+<td style="text-align: right;">4.65e+08</td>
+<td style="text-align: right;">614700000</td>
+<td style="text-align: right;">210</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">4.46e+08</td>
+<td style="text-align: right;">4.69e+08</td>
+<td style="text-align: right;">4.07e+08</td>
+<td style="text-align: right;">4.14e+08</td>
+<td style="text-align: right;">4.35e+08</td>
+<td style="text-align: right;">4.30e+08</td>
+<td style="text-align: right;">4.81e+08</td>
+<td style="text-align: right;">5.30e+08</td>
+<td style="text-align: left;">Premier League</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">77</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">11</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<table class="table table-striped table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">cod</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">team</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_n</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cup</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_cont</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">league_title</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">tv_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">season_profit</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pay</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_in</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">player_out</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sponsor</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">kit</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">financial_fp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">renda_22</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">despesa_22</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">league_name</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">matches_played</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_scored</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">goals_received</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">wins</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">draws</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">losses</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">B04</td>
+<td style="text-align: left;">LEVERKUSEN</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">W</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">76470000</td>
+<td style="text-align: right;">83659006</td>
+<td style="text-align: right;">160129006</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">7.5</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Bundesliga</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">89</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">VFB</td>
+<td style="text-align: left;">VFB STUTTGART</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">74970000</td>
+<td style="text-align: right;">43821496</td>
+<td style="text-align: right;">118791496</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">4.0</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Bundesliga</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">78</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FCB</td>
+<td style="text-align: left;">BAYERN</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">72090000</td>
+<td style="text-align: right;">95532698</td>
+<td style="text-align: right;">167622698</td>
+<td style="text-align: right;">310</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">60.0</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Bundesliga</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">94</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RBL</td>
+<td style="text-align: left;">RB LEIPZIG</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">71240000</td>
+<td style="text-align: right;">80662113</td>
+<td style="text-align: right;">151902113</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">5.0</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Bundesliga</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">77</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BVB</td>
+<td style="text-align: left;">BORUSSIA DORTMUND</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">86140000</td>
+<td style="text-align: right;">84046638</td>
+<td style="text-align: right;">170186638</td>
+<td style="text-align: right;">180</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">45.0</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Bundesliga</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">68</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SGE</td>
+<td style="text-align: left;">EINTRACHT</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: left;">L</td>
+<td style="text-align: right;">67780000</td>
+<td style="text-align: right;">79116632</td>
+<td style="text-align: right;">146896632</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">6.0</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Bundesliga</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">9</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="gráficos" class="level1">
+<h1>Gráficos</h1>
+<p>Os gráficos a seguir ajudarão a visualizar as distribuição de renda entre times e ligas para uma melhor analise de desempenho.</p>
+<p><em><strong>Nota:</strong> Não estão exibidos os gráficos de todas as ligas neste documento, apresento aqui apenas uma demonstração.</em></p>
+<section id="gráfico-de-barras-monetário" class="level2">
+<h2 class="anchored" data-anchor-id="gráfico-de-barras-monetário">Gráfico de Barras Monetário<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#gr%C3%A1fico-de-barras-monet%C3%A1rio" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<section id="brasileirão" class="level3">
+<h3 class="anchored" data-anchor-id="brasileirão">Brasileirão<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#brasileir%C3%A3o" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./Ligas e Times de Futebol (EDA)_files/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./Ligas e Times de Futebol (EDA)_files/unnamed-chunk-13-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="liegue-1" class="level3">
+<h3 class="anchored" data-anchor-id="liegue-1">Liegue 1<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#liegue-1" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./Ligas e Times de Futebol (EDA)_files/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./Ligas e Times de Futebol (EDA)_files/unnamed-chunk-14-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Este gráfico mostra o lucro da temporada de cada time. Os valores em milhões/bilhões são representados em notação científica. Times com maior lucro estão mais bem posicionados financeiramente.</p>
+</section>
+</section>
+<section id="desempenho-monetário-por-ligas" class="level2">
+<h2 class="anchored" data-anchor-id="desempenho-monetário-por-ligas">Desempenho Monetário Por Ligas<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#desempenho-monet%C3%A1rio-por-ligas" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./Ligas e Times de Futebol (EDA)_files/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Este gráfico compara o lucro da temporada entre diferentes ligas. Os boxplots mostram a distribuição dos lucros dentro de cada liga, com os pontos indicando os times individuais. Use este gráfico para identificar ligas mais lucrativas e a variação de lucros entre os times. Cada região tem sua respectiva moeda, os valores estão padronizados.</p>
+</section>
+<section id="desempenho-e-renda" class="level2">
+<h2 class="anchored" data-anchor-id="desempenho-e-renda">Desempenho e Renda<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#desempenho-e-renda" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<section id="brasileirão-1" class="level3">
+<h3 class="anchored" data-anchor-id="brasileirão-1">Brasileirão<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#brasileir%C3%A3o-1" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using size for a discrete variable is not advised.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./Ligas e Times de Futebol (EDA)_files/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="ligue-1" class="level3">
+<h3 class="anchored" data-anchor-id="ligue-1">Ligue 1<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#ligue-1" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using size for a discrete variable is not advised.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./Ligas e Times de Futebol (EDA)_files/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Este gráfico mostra o desempenho dos times em termos de lucro da temporada e posição final no campeonato. Pontos coloridos indicam se o time ganhou o campeonato nacional e o tamanho dos pontos indica se o time ganhou o campeonato continental. As etiquetas mostram o nome de cada time.</p>
+</section>
+</section>
+<section id="análise-de-clusters" class="level2">
+<h2 class="anchored" data-anchor-id="análise-de-clusters">Análise de Clusters<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#an%C3%A1lise-de-clusters" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./Ligas e Times de Futebol (EDA)_files/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./Ligas e Times de Futebol (EDA)_files/unnamed-chunk-22-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Este gráfico mostra a análise de clusters de desempenho dos times. Cada cluster agrupa times com características semelhantes em termos de gols, vitórias, derrotas, empates e lucro da temporada.</p>
+</section>
+</section>
+<section id="regressão-linear" class="level1">
+<h1>Regressão Linear</h1>
+<p>Por fim, irei realizar um modelo de regressão linear para previsão futura do desempenho dos times com nas suas principais competências no campeonato.</p>
+<section id="treino-e-teste" class="level2">
+<h2 class="anchored" data-anchor-id="treino-e-teste">Treino e Teste<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#treino-e-teste" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>  goals_scored   goals_received        wins           losses     
+ Min.   :26.00   Min.   : 22.00   Min.   : 2.00   Min.   : 0.00  
+ 1st Qu.:40.00   1st Qu.: 42.00   1st Qu.: 9.00   1st Qu.:10.00  
+ Median :49.00   Median : 50.50   Median :13.00   Median :14.00  
+ Mean   :51.72   Mean   : 51.72   Mean   :13.54   Mean   :13.54  
+ 3rd Qu.:58.50   3rd Qu.: 60.25   3rd Qu.:18.00   3rd Qu.:17.00  
+ Max.   :96.00   Max.   :104.00   Max.   :29.00   Max.   :28.00  
+     draws        matches_played     league_n     league_cup league_cont
+ Min.   : 3.000   Min.   :34.00   Min.   : 1.00   L:110      L:113      
+ 1st Qu.: 8.000   1st Qu.:34.00   1st Qu.: 5.00   W:  6      W:  3      
+ Median : 9.000   Median :38.00   Median :10.00                         
+ Mean   : 9.672   Mean   :36.76   Mean   :10.19                         
+ 3rd Qu.:11.000   3rd Qu.:38.00   3rd Qu.:15.00                         
+ Max.   :19.000   Max.   :38.00   Max.   :20.00                         </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+ 38000000  77575000 125093854 202284201 247875000 925800000 </code></pre>
+</div>
+</div>
+</section>
+<section id="visualização-do-modelo" class="level2">
+<h2 class="anchored" data-anchor-id="visualização-do-modelo">Visualização do Modelo<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#visualiza%C3%A7%C3%A3o-do-modelo" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="https://8a807c99eb2a4cfa934fe720dbd77f1b.app.posit.cloud/p/2a5f9eb1/#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(regre_plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./Ligas e Times de Futebol (EDA)_files/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="problemática" class="level1">
+<h1>Problemática</h1>
+<p>Quando falamos de futebol, por consequência estamos lidando com grandes quantias em investimentos e apostas.</p>
+<p>Com esta análise, é possível tomar decisões difíceis em relação a investimento em times com base em características padrões de desempenho.</p>
+<p>Analisar estes dados, significa detectar padrões em times de diferentes ligas, facilitando decisões que a um olhar descuidado, poderiam ser difíceis e arriscadas.</p>
+</section>
+<section id="conclusões" class="level1">
+<h1>Conclusões</h1>
+<p>Com a visualização do lucro da temporada, stakeholders podem tomar decisões informadas sobre investimentos e estratégias financeiras.</p>
+<p>A análise de clusters pode ajudar a identificar padrões de desempenho semelhantes entre os times, o que pode ser útil para treinadores e analistas. Vale ressaltar que a visualização dos gráficos e o modelo de predição, podem ser ajustados para visualização de ligas e times específicos.</p>
+<p>A partir do modelo treinado, pode-se tirar conclusões sobre um possível rendimento de times em relação ao seu desempenho, como, por exemplo, um time que marca mais gols tem uma probabilidade maior de ir bem no setor financeiro.</p>
+<p>Com melhores no modelo de predição, como a adição de um algorítimo de validação cruzada, pode tornar esta ferramenta ainda mais robusta.</p>
+<p>Clique <a href="https://github.com/guifzy/site_shiny">aqui</a>, caso tenha interesse em visualizar meu projeto completo.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+
+<script>window.backupDefine = window.define; window.define = undefined;</script>
+<script type="text/javascript" src="./Ligas e Times de Futebol (EDA)_files/quarto-preview.js.download"></script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+<script type="text/javascript">
+  const options = {
+    origin: "",
+    search: "",
+    inputFile: "/cloud/project/site_shiny/eda_futebol.qmd",
+    isPresentation: false
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    window.QuartoPreview.init(options);
+  });
+</script>
+<div><div dir="ltr" class="fui-FluentProvider fui-FluentProviderr0 ___jdtuxv0 f19n0e5 fxugw4r f1o700av fk6fouc fkhj508 figsok6 f1i3iumi"></div></div><i tabindex="0" role="none" data-tabster-dummy="" aria-hidden="true" style="position: fixed; height: 1px; width: 1px; opacity: 0.001; z-index: -1; content-visibility: hidden; top: 0px; left: 0px;"></i></body></html>
