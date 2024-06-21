@@ -2,7 +2,7 @@
 
 Site em shiny para analise do desempenho de times de futebol.
 
-Acesse [aqui](file:///C:/Users/guipi/Downloads/Ligas%20e%20Times%20de%20Futebol%20(EDA).html) apresentação do projeto!
+Clique [aqui](https://github.com/guifzy/site_shiny/blob/main/Ligas%20e%20Times%20de%20Futebol%20(EDA).html) e faça o download HTML da apresentação do projeto!
 
 # Objetivo:
 
